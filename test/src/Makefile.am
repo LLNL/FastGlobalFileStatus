@@ -25,12 +25,7 @@ test_PROGRAMS                  = sync_stat_dso_mpi \
                                  gen_hostlist \
                                  mrnet_node_req
 
-test_SCRIPTS                   = mrnet_topo_gen.sh \
-                                 run.fgfs_tester.sh.in \
-                                 run.fgfs_tester_mpi.sh.in \
-                                 MRNetScalingSetup.sh \
-                                 MPIScalingSetup.sh
-
+test_SCRIPTS                   = mrnet_topo_gen.sh 
 
 CLEANFILES                     = $(test_SCRIPTS)
 EXTRA_DIST                     = mrnet_topo_gen.sh.in \
