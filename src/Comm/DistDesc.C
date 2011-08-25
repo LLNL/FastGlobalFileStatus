@@ -1,0 +1,471 @@
+/*
+ * --------------------------------------------------------------------------------
+ * Copyright (c) 2011, Lawrence Livermore National Security, LLC. Produced at
+ * the Lawrence Livermore National Laboratory. Written by Dong H. Ahn <ahn1@llnl.gov>.
+ * All rights reserved.
+ *
+ * Update Log:
+ *
+ *        Jun 27 2011 DHA: File created
+ *
+ */
+
+#include "DistDesc.h"
+
+using namespace FastGlobalFileStat;
+using namespace FastGlobalFileStat::CommLayer;
+
+
+///////////////////////////////////////////////////////////////////
+//
+//  static data
+//
+//
+
+
+///////////////////////////////////////////////////////////////////
+//
+//  PUBLIC INTERFACE:   namespace FastGlobalFileStat::CommLayer
+//
+//
+
+///////////////////////////////////////////////////////////////////
+//
+//  class ReduceDesc
+//
+//
+ReduceDesc::ReduceDesc()
+{
+    rd[0] = 0;
+    rd[1] = 0;
+}
+
+
+ReduceDesc::~ReduceDesc()
+{
+
+}
+
+
+ReduceDesc::ReduceDesc(const ReduceDesc &rhs)
+{
+    rd[0] = rhs.rd[0];
+    rd[0] = rhs.rd[1];
+}
+
+
+void
+ReduceDesc::setFirstRank(FgfsId_t rnk)
+{
+    rd[0] = rnk;
+}
+
+
+void
+ReduceDesc::countIncr()
+{
+    rd[1]++;
+}
+
+
+void
+ReduceDesc::incrCountBy(FgfsCount_t incr)
+{
+    rd[1] += incr;
+}
+
+
+FgfsId_t
+ReduceDesc::getFirstRank() const
+{
+    return (rd[0]);
+}
+
+
+FgfsCount_t
+ReduceDesc::getCount() const
+{
+    return (FgfsCount_t (rd[1]));
+}
+
+
+///////////////////////////////////////////////////////////////////
+//
+//  class FgfsParDesc
+//
+//
+
+FgfsParDesc::FgfsParDesc()
+    : mGlobalRank(FGFS_NOT_FILLED),
+      mGlobalMaster(false),
+      mSize(FGFS_NOT_FILLED),
+      numOfGroups(FGFS_NOT_FILLED),
+      mGroupId(FGFS_NOT_FILLED),
+      mRankInGroup(FGFS_NOT_FILLED),
+      mGroupSize(FGFS_NOT_FILLED),
+      mRepInGroup(FGFS_NOT_FILLED)
+{
+
+}
+
+
+FgfsParDesc::FgfsParDesc(const FgfsParDesc &o)
+{
+    mGlobalRank = o.mGlobalRank;
+    mGlobalMaster = o.mGlobalMaster;
+    mSize = o.mSize;
+    numOfGroups = o.numOfGroups;
+
+    mGroupId = o.mGroupId;
+    mRankInGroup = o.mRankInGroup;
+    mGroupSize = o.mGroupSize;
+    mRepInGroup = o.mRepInGroup;
+
+    mUriString = o.mUriString;
+    groupingMap = o.groupingMap;
+}
+
+
+FgfsParDesc::~FgfsParDesc()
+{
+    if (!groupingMap.empty()) {
+        groupingMap.clear();
+    }
+}
+
+
+FgfsParDesc &
+FgfsParDesc::operator=(const FgfsParDesc &rhs)
+{
+    mGlobalRank = rhs.mGlobalRank;
+    mGlobalMaster = rhs.mGlobalMaster;
+    mSize = rhs.mSize;
+    numOfGroups = rhs.numOfGroups;
+
+    mGroupId = rhs.mGroupId;
+    mRankInGroup = rhs.mRankInGroup;
+    mGroupSize = rhs.mGroupSize;
+    mRepInGroup = rhs.mRepInGroup;
+
+    mUriString = rhs.mUriString;
+    groupingMap = rhs.groupingMap;
+}
+
+
+
+FGFSInfoAnswer
+FgfsParDesc::isRep() const
+{
+    FGFSInfoAnswer answer = ans_error;
+
+    if(IS_YES(isGroupingDone())) {
+        if (mRankInGroup == mRepInGroup) {
+            answer = ans_yes;
+        }
+        else {
+            answer = ans_no;
+        }
+    }
+
+    return ans_error;
+}
+
+
+FGFSInfoAnswer
+FgfsParDesc::isGroupingDone() const
+{
+    FGFSInfoAnswer answer = ans_no;
+
+    if (mGroupId != FGFS_NOT_FILLED) {
+        answer = ans_yes;
+    }
+
+    return answer;
+}
+
+
+FGFSInfoAnswer
+FgfsParDesc::isSingleGroup() const
+{
+    FGFSInfoAnswer answer = ans_no;
+
+    if (numOfGroups == 1) {
+        answer = ans_yes;
+    }
+
+    return answer;
+}
+
+
+FGFSInfoAnswer
+FgfsParDesc::isGlobalMaster() const
+{
+    FGFSInfoAnswer answer = ans_no;
+
+    if (mGlobalMaster) {
+        answer = ans_yes;
+    }
+
+    return answer;
+}
+
+
+void
+FgfsParDesc::setRank(FgfsId_t rnk)
+{
+    mGlobalRank = rnk;
+}
+
+
+FgfsId_t 
+FgfsParDesc::getRank() const
+{
+    return mGlobalRank;
+}
+
+
+void
+FgfsParDesc::setGlobalMaster()
+{
+    mGlobalMaster = true;
+}
+
+
+void
+FgfsParDesc::unsetGlobalMaster()
+{
+    mGlobalMaster = false;
+}
+
+
+void
+FgfsParDesc::setSize(FgfsCount_t sz)
+{
+    mSize = sz;
+}
+
+
+FgfsCount_t
+FgfsParDesc::getSize() const
+{
+    return mSize;
+}
+
+
+void
+FgfsParDesc::setNumOfGroups(FgfsCount_t sz)
+{
+    numOfGroups = sz;
+}
+
+
+FgfsCount_t
+FgfsParDesc::getNumOfGroups() const
+{
+    return numOfGroups;
+
+}
+
+
+void
+FgfsParDesc::setGroupId(FgfsId_t gid)
+{
+    mGroupId = gid;
+}
+
+
+FgfsId_t
+FgfsParDesc::getGroupId() const
+{
+    return mGroupId;
+}
+
+
+void
+FgfsParDesc::setRankInGroup(FgfsId_t grnk)
+{
+    mRankInGroup = grnk;
+}
+
+
+FgfsId_t
+FgfsParDesc::getRankInGroup() const
+{
+    return mRankInGroup;
+}
+
+
+void
+FgfsParDesc::setGroupSize(FgfsCount_t sz)
+{
+    mRankInGroup = sz;
+}
+
+
+FgfsCount_t
+FgfsParDesc::getGroupSize() const
+{
+    return mRankInGroup;
+}
+
+
+void
+FgfsParDesc::setRepInGroup(FgfsId_t rnk)
+{
+    mRepInGroup = rnk;
+}
+
+
+FgfsId_t
+FgfsParDesc::getRepInGroup() const
+{
+    return mRepInGroup;
+}
+
+
+void 
+FgfsParDesc::setUriString(const std::string &uri)
+{
+    mUriString = uri;
+}
+
+
+const std::string & 
+FgfsParDesc::getUriString() const
+{
+    return mUriString;
+}
+
+
+size_t
+FgfsParDesc::pack(char *buf, size_t s) const
+{
+    char *t = buf;
+
+    std::map<std::string, ReduceDesc>::const_iterator i;
+
+    for(i = groupingMap.begin(); i != groupingMap.end(); ++i) {
+        memcpy((void *)t, i->second.rd, sizeof(i->second.rd));
+        t += sizeof(i->second.rd);
+        memcpy((void *)t, i->first.c_str(), i->first.length() + 1);
+        t += i->first.length() + 1;
+    }
+
+    return (size_t) (t - buf);
+}
+
+
+size_t
+FgfsParDesc::unpack(char *buf, size_t s)
+{
+    char *t = buf;
+    ReduceDesc redDescObj;
+    std::string uriKey;
+
+    //
+    //  buffer format: rank|count|uriString1|rank|count|uriString2 ...
+    //
+    while ((size_t)(t - buf) < s) {
+        memcpy((void *) redDescObj.rd, (void *)t, sizeof(redDescObj.rd));
+        t += sizeof(redDescObj.rd);
+        uriKey = t;
+        t += uriKey.length() + 1;
+
+        std::map<std::string, ReduceDesc>::iterator iter;
+        iter = groupingMap.find(uriKey);
+        if (iter != groupingMap.end()) {
+            redDescObj.setFirstRank(iter->second.getFirstRank());
+            redDescObj.incrCountBy(iter->second.getCount());
+        }
+
+        groupingMap[uriKey] = redDescObj;
+    }
+
+    return (size_t) (t - buf);
+}
+
+
+size_t
+FgfsParDesc::packedSize() const
+{
+    std::map<std::string, ReduceDesc>::const_iterator i;
+    size_t s = 0;
+
+    for(i = groupingMap.begin(); i != groupingMap.end(); ++i) {
+        s += (size_t) (sizeof(i->second.rd) + i->first.length() + 1);
+    }
+
+    return s;
+}
+
+
+FGFSInfoAnswer
+FgfsParDesc::insert(std::string &item, ReduceDesc &robj)
+{
+    FGFSInfoAnswer answer = ans_yes;
+
+    groupingMap[item] = robj;
+
+    return answer;
+}
+
+
+FGFSInfoAnswer
+FgfsParDesc::mapEmpty()
+{
+    return (groupingMap.empty())? ans_yes : ans_no;
+}
+
+
+FGFSInfoAnswer
+FgfsParDesc::clearMap()
+{
+    FGFSInfoAnswer answer = ans_yes;
+
+    if (!groupingMap.empty()) {
+        groupingMap.clear();
+    }
+    else {
+        answer = ans_error;
+    }
+
+    return answer;
+}
+
+
+std::map<std::string, ReduceDesc>&
+FgfsParDesc::getGroupingMap()
+{
+    return groupingMap;
+}
+
+
+
+FGFSInfoAnswer
+FgfsParDesc::setGroupInfo()
+{
+    FGFSInfoAnswer answer = ans_yes;
+
+    std::map<std::string, ReduceDesc>::iterator iter;
+    iter = groupingMap.find(mUriString);
+
+    setNumOfGroups(groupingMap.size());
+
+    if (iter != groupingMap.end()) {
+        setRepInGroup(iter->second.getFirstRank());
+        setGroupId(iter->second.getFirstRank());
+        if (getRepInGroup() == getRank()) {
+            setRankInGroup(0);
+        }
+        else {
+            setRankInGroup(getRank());
+        }
+        setGroupSize(iter->second.getCount());
+    }
+    else {
+        answer = ans_error;
+    }
+
+    return answer;
+}
+

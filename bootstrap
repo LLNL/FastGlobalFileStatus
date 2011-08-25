@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# $Header: $
+#--------------------------------------------------------------------------------
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC. Produced at
+# the Lawrence Livermore National Laboratory. Written by Dong H. Ahn <ahn1@llnl.gov>.
+# LLNL-CODE-xxxxxx. All rights reserved.
+#
+#--------------------------------------------------------------------------------
+#
+#  Update Log:
+#        June 29 2011 DHA: Created file.
+#
+
+set -x 
+aclocal -I config 
+libtoolize --force --copy
+autoheader
+automake --foreign --add-missing --copy 
+autoconf 
+

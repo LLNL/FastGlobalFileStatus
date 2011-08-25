@@ -1,0 +1,350 @@
+/*
+ * --------------------------------------------------------------------------------
+ * Copyright (c) 2011, Lawrence Livermore National Security, LLC. Produced at
+ * the Lawrence Livermore National Laboratory. Written by Dong H. Ahn <ahn1@llnl.gov>.
+ * All rights reserved.
+ *
+ * Update Log:
+ *
+ *        Jun 21 2011 DHA: Copied from the old FastGlobalFileStat.h
+ *                         to organize the classes to support sync and async 
+ *                         abstractions.
+ *        Feb 17 2011 DHA: Added Doxygen style documentation.
+ *        Feb 15 2011 DHA: Added StorageClassifier support.
+ *        Feb 15 2011 DHA: Changed main higher level abstrations for
+ *                         GlobalFileStat to be isUnique, isPoorlyDistributed
+ *                         isWellDistributed, and isFullyDistributed.
+ *        Jan 13 2011 DHA: File created.
+ *
+ */
+
+#ifndef FAST_GLOBAL_FILE_STAT_H
+#define FAST_GLOBAL_FILE_STAT_H 1
+
+extern "C" {
+#include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+}
+
+#include <string>
+#include "MountPointAttr.h"
+#include "Comm/CommFabric.h"
+
+
+namespace FastGlobalFileStat {
+
+    /**
+     *   Enumerates algorithm types. These represent internal
+     *   alorithms that the fast global file stat uses to
+     *   embody its abstractions
+     */
+    enum CommAlgorithms {
+        bloomfilter,
+        sampling,
+        hier_commsplit,
+        bloomfilter_hier_commsplit,
+        sampling_hier_commsplit,
+        algo_unknown
+    };
+
+
+    /**
+     *   Base class that serves as a high-level Global File Stat 
+     *   interface in a underlying communication fabric independent manner.
+     */
+    class GlobalFileStatBase {
+    public:
+
+        /**
+         *   GlobalFileStatBase::FGFS_NPROC_TO_SATURATE (64)
+         *   Defines the process count that serves as a
+         *   threshold above which to saturate a shared file server.
+         */
+        static const int FGFS_NPROC_TO_SATURATE = 64;
+
+        /**
+         *   GlobalFileStatBase::FGFS_UNIQUE_RANGE_MAX (3)
+         *   For small scale cases, even wellDistributed cases can be unique
+         *   so upper layer should do an additional check of
+         *   if getCardinalityEst is leq FGFS_UNIQUE_RANGE_MAX
+         */
+        static const int FGFS_UNIQUE_RANGE_MAX = 3;
+
+        /**
+         *   GlobalFileStatBase Ctor
+         *
+         *   @param[in] pth an absolute path with no links to a file
+         *   @return none
+         */
+        GlobalFileStatBase(const char *pth);
+
+        /**
+         *   GlobalFileStatBase Ctor
+         *
+         *   @param[in] pth an absolute path with no links to a file
+         *   @param[in] threshold a process count to staturate the
+         *                         file server; when you want to overwrite
+         *                         the default threshold.
+         *   @return none
+         */
+        GlobalFileStatBase(const char *pth, const int threshold);
+
+        virtual ~GlobalFileStatBase();
+
+        /**
+         *   Return the MountPointInfo object, class static object holding
+         *   all the information about the per-node mount points
+         *
+         *   @return an MountPointInfo object
+         */
+        static const MountPointAttribute::MountPointInfo & getMpInfo();
+
+        /**
+         *   Return the CommFabric object, class static object holding
+         *   communcation fabric layer
+         *
+         *   @return a CommFabric object
+         */
+        static const CommLayer::CommFabric *getCommFabric();
+
+        /**
+         *   Initialize including communication fabric bootstrapping
+         *
+         *   @param[in] c CommFabric object
+         *
+         *   @return a bool value
+         */
+        static bool initialize(CommLayer::CommFabric *c);
+
+        /**
+         *   Is the path served in the fully distributed fashion?
+         *   The path is served through node local storage. Yes implies
+         *   yes for isWellDistributed, but the overhead of this method
+         *   is higher than isWellDistributed.
+         *   (virtual interface)
+         *
+         *   @return an FGFSInfoAnswer object
+         */
+        virtual FGFSInfoAnswer isFullyDistributed() const = 0;
+
+        /**
+         *   Is the path served in a well distributed fashion?
+         *   The avergage number of processes per file servers is
+         *   higher than or equal to thresholdToSaturate.
+         *   (virtual interface)
+         *
+         *   @return an FGFSInfoAnswer object
+         */
+        virtual FGFSInfoAnswer isWellDistributed() const = 0;
+
+        /**
+         *   Negation of isWellDistributed.
+         *   (virtual interface)
+         *
+         *   @return an FGFSInfoAnswer object
+         */
+        virtual FGFSInfoAnswer isPoorlyDistributed() const = 0;
+
+        /**
+         *   Is the path served by a single file server?
+         *   Yes implies yes for isPoorlyDistributed, but the overhead
+         *   of this method is higher than isPoorlyDistributed.
+         *   (virtual interface)
+         *
+         *   @return an FGFSInfoAnswer object
+         */
+        virtual FGFSInfoAnswer isUnique() = 0;
+
+        /**
+         *   Return the target path
+         *   @return a target path string
+         */
+        const char * getPath() const;
+
+        /**
+         *   Return grouping information
+         *   @return a FgfsParDesc object
+         */
+        CommLayer::FgfsParDesc & getParallelInfo();
+
+        /**
+         *   Check if there has been an error encountered
+         *   @return true if an error
+         */
+        bool hasError();
+
+
+    protected:
+
+
+        /**
+         *   Return MyMntEnt
+         *   @return a MyMntEnt object
+         */
+        const MountPointAttribute::MyMntEnt &getMyEntry() const;
+
+        /**
+         *   Return ThresholdToSaturate
+         *   @return the current threshold of int
+         */
+        int getThresholdToSaturate() const;
+
+        /**
+         *   Set ThresholdToSaturate
+         *   @param[in] new threshold
+         *   @return the old int threshold
+         */
+        int setThresholdToSaturate(const int sg);
+
+        /**
+         *   Get high low cutoff point
+         *   @return high low cutoff point of integer type
+         */
+        int getHiLoCutoff() const;
+
+        /**
+         *   Set high low cutoff point
+         *   @param[in] new high low point of integer type
+         *   @return the old high low point of integer type
+         */
+        int setHiLoCutoff(const int th);
+
+        /**
+         *   Check if the path globally node-local
+         *   @return yes or no of bool type
+         */
+        bool isNodeLocal() const;
+
+        /**
+         *   Return cardinality estimate
+         *   @return an integer cardinality
+         */
+        int getCardinalityEst() const;
+
+        /**
+         *   Set CardinalityEst
+         *   @param[in] new  CardinalityEst of integer type
+         *   @return the old CardinalityEst of integer type
+         */
+        int setCardinalityEst(const int d);
+
+        /**
+         *   Performs necessary communication to determine global
+         *   properties including a number of different equivalent
+         *   groups
+         *   @return success or failure of bool type
+         */
+        bool computeParallelInfo();
+
+        /**
+         *   Performs cardinality estimate: how many different equivalent 
+         *   groups are there? The client can get this estimate with
+         *   the getCardinalityEst method
+         *   @return success or failure of bool type
+         */
+        bool computeCardinalityEst(CommAlgorithms algo=bloomfilter);
+
+        /**
+         *   Performs cardinality estimate based on the bloomfilter
+         *   algorithm.
+         *   @return success or failure of bool type
+         */
+        bool bloomfilterCardinalityEst();
+
+        /**
+         *   Performs cardinality estimate based on the sampling
+         *   algorithm
+         *   @return success or failure of bool type
+         */
+        bool samplingCardinalityEst();
+
+        /**
+         *   Performs cardinality estimate based on the generalized
+         *   comm-split
+         *   @return success or failure of bool type
+         */
+        bool hier_commsplitCardinality();
+
+        /**
+         *   Performs cardinality check (accurate) based on the
+         *   actual list reduction.
+         *   @return success or failure of bool type
+         */
+        bool plain_parallelInfo();
+
+
+    private:
+
+        GlobalFileStatBase();
+
+        GlobalFileStatBase(const GlobalFileStatBase &s);
+
+        uint32_t getPopCount(uint32_t *filter, uint32_t s);
+
+        /**
+         *   error indicator
+         */
+        bool mHasErr;
+
+        /**
+         *   algorithm selector
+         */
+        CommAlgorithms mAlgorithm;
+
+        /**
+         *   a process count that would saturate a single file server
+         */
+        int mThresholdToSaturate;
+
+        /**
+         *   cutoff in terms of p/maxNPPerGroup
+         */
+        int mHiLoCutoff;
+
+        /**
+         *   target path
+         */
+        std::string mPath;
+
+        /**
+         *   parallel information such as your repr task and ranks
+         */
+        CommLayer::FgfsParDesc mParallelInfo;
+
+        /**
+         *   globally unique file ID for path on this node
+         */
+        MountPointAttribute::FileUriInfo mUri;
+
+        /**
+         *   Local MyMntEnt entry for m_path
+         */
+        MountPointAttribute::MyMntEnt mEntry;
+
+        /**
+         *   is m_path local
+         */
+        bool mNodeLocal;
+
+        /**
+         *   max likelihood of the set cardinality
+         */
+        int mCardinalityEst;
+
+
+        /**
+         *   communication fabric (does this have to be static?)
+         */
+        static CommLayer::CommFabric *mCommFabric;
+
+        /**
+         *   per-node mount point information
+         */
+        static MountPointAttribute::MountPointInfo mpInfo;
+    };
+}
+
+#endif // FAST_GLOBAL_FILE_STAT_H
+
