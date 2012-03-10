@@ -19,7 +19,7 @@ extern "C" {
 
 #include "SyncFastGlobalFileStat.h"
 
-class OpenSSLFileSignitureGen : public FastGlobalFileStat::FileSignitureGen {
+class OpenSSLFileSignitureGen : public FastGlobalFileStatus::FileSignitureGen {
 public:
     virtual ~OpenSSLFileSignitureGen() {}
     virtual unsigned char *

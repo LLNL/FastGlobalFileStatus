@@ -8,7 +8,7 @@
  *
  *        Jun 22 2011 DHA: File created. Moved StorageClassifier from
  *                         FastGlobalFileStat.h to put that service into an
- *                         independent module.
+ *                         independent class.
  *
  */
 
@@ -16,10 +16,68 @@
 #define STORAGE_CLASSIFIER_H 1
 
 #include "SyncFastGlobalFileStat.h"
+#include "MountPointsClassifier.h"
 
-namespace FastGlobalFileStat {
+
+namespace FastGlobalFileStatus {
 
   namespace StorageInfo {
+
+    typedef uint64_t nbytes_t;
+
+
+    /**
+     *   Defines a data type that inherits SynGlobalFileStatus
+     *   to help check space requirement for each mount-point-path.
+     */
+    class StorageGlobalFileStatus : public SyncGlobalFileStatus {
+    public:
+
+        /**
+         *   StorageGlobalFileStatus Ctor
+         *
+         *   @param[in] pth an absolute path with no links to a file
+         *   @param[in] c CommFabric object
+         *   @param[in] net opaque network object
+         *   @param[out] dedicatedChannel opaque channle object
+         *   @return none
+         */
+        StorageGlobalFileStatus(const char *pth);
+
+        /**
+         *   StorageGlobalFileStatus Ctor
+         *
+         *   @param[in] pth an absolute path with no links to a file
+         *   @param[in] threshold a process count to staturate the
+         *                         file server; when you want to overwrite
+         *                         the default threshold.
+         *   @param[in] c CommFabric object
+         *   @param[in] net opaque network object
+         *   @param[out] dedicatedChannel opaque channle object
+         *   @return none
+         */
+        StorageGlobalFileStatus(const char *pth, const int threshold);
+
+        virtual ~StorageGlobalFileStatus();
+
+        /**
+         *   Class Static Initializer. (Call once for the entire class hierarchy)
+         *   This is a global collective: all distributed component must
+         *   call synchronously.
+         *
+         *   @param[in] c pointer to a CommFabric object
+         *   @return a bool value
+         */
+        static bool initialize(CommLayer::CommFabric *c);
+
+        FGFSInfoAnswer meetSpaceRequirement(nbytes_t bytesNeededlocally,
+                               nbytes_t *bytesNeededGlobally,
+                               nbytes_t *bytesNeededWithinGroup,
+                               nbytes_t *bytesAvailableWithinGroup,
+                               int *distEst);
+
+    };
+
 
     /**
      *   Defines a data type to specify storage selection criteria.
@@ -28,59 +86,84 @@ namespace FastGlobalFileStat {
     class StorageCriteria {
     public:
 
+        typedef nbytes_t SpaceRequirement;
+
         /**
          * SPEED_XXX:        Serial access speed to the storage
          * DISTRIBUTION_XXX: How many remote file servers serve the storage
          * FS_SCAL_XXX: Interent scalability of the storage
          */
-        enum Requirement {
-            NO_REQUIREMENT     = 0x00000000, /*!< no requirement */
-            SPEED_LOW          = 0x00000001, /*!< Require low serial access performance */
-            SPEED_HIGH         = 0x00000002, /*!< Require high serial access performance */
-            DISTRIBUTED_NONE   = 0x00000003, /*!< Require storage that is not distributed */
-            DISTRIBUTED_LOW    = 0x00000004, /*!< Require poorly distributed storage */
-            DISTRIBUTED_HIGH   = 0x00000005, /*!< Require well distributed storage */
-            DISTRIBUTED_FULL   = 0x00000006, /*!< Require fully distributed storage (node local) */
-            FS_SCAL_SINGLE     = 0x00000007, /*!< Require non-parallel storage */
-            FS_SCAL_MULTI      = 0x00000008  /*!< Require parallel storage */
+        enum SpeedRequirement {
+            SPEED_REQUIRE_NONE = 0x00000000, /*!< no requirement */
+            SPEED_LOW          = 0x00000001, /*!< Requires low serial access performance */
+            SPEED_HIGH         = 0x00000002  /*!< Requires high serial access performance */
+        };
+
+        enum DistributionRequirement {
+            DISTRIBUTED_REQUIRE_NONE = 0x00000000, /*!< no requirement */
+            DISTRIBUTED_UNIQUE = 0x00000003, /*!< Requires globally shared storage (Unique) */
+            DISTRIBUTED_LOW    = 0x00000004, /*!< Requires lowly distributed storage (Poorly including Unique) */
+            DISTRIBUTED_HIGH   = 0x00000005, /*!< Requires highly distributed storage (Well including Fully) */
+            DISTRIBUTED_FULL   = 0x00000006  /*!< Requires fully distributed storage (Fully) */
+        };
+
+        enum ScalabilityRequirement {
+            FS_SCAL_REQUIRE_NONE  = 0x00000000, /*!< no requirement */
+            FS_SCAL_SINGLE     = 0x00000007, /*!< Requires serial storage */
+            FS_SCAL_MULTI      = 0x00000008  /*!< Requires parallel storage */
         };
 
         StorageCriteria();
+
+        StorageCriteria(nbytes_t bytesNeeded,
+                        nbytes_t bytesFree=0,
+                        SpeedRequirement speed=SPEED_REQUIRE_NONE,
+                        DistributionRequirement dist=DISTRIBUTED_REQUIRE_NONE,
+                        ScalabilityRequirement scal=FS_SCAL_REQUIRE_NONE);
 
         StorageCriteria(const StorageCriteria &criteria);
 
         ~StorageCriteria();
 
-        void setSpaceRequirement(int64_t bytesNeeded, int64_t bytesToFree);
+        void setSpaceRequirement(nbytes_t bytesNeeded,
+                                 nbytes_t bytesToFree);
 
-        void setDistributionRequirement(int distDegree);
+        void setDistributionRequirement(DistributionRequirement dist);
 
-        void setSpeedRequirement(int speedReq);
+        void setSpeedRequirement(SpeedRequirement speed);
 
-        void setFsScalabilityRequirement(int scalReq);
+        void setScalabilityRequirement(ScalabilityRequirement scale);
 
-        const int64_t getSpaceRequirement() const;
+        const SpaceRequirement getSpaceRequirement() const;
 
-        const int64_t getSpaceToFree() const;
+        const nbytes_t getSpaceToFree() const;
 
-        const int getDistributionRequirement() const;
+        const DistributionRequirement getDistributionRequirement() const;
 
-        const int getSpeedRequirement() const;
+        const SpeedRequirement getSpeedRequirement() const;
 
-        const int getFsScalabilityRequirement() const;
+        const ScalabilityRequirement getScalabilityRequirement() const;
+
+        bool isRequireNone() const;
 
 
     private:
 
-        int64_t spaceRequirement;
+        nbytes_t spaceRequirement;
 
-        int64_t spaceToFree;
+        nbytes_t spaceToFree;
 
-        int speedRequirement;
+        SpeedRequirement speedRequirement;
 
-        int distributionRequirement;
+        DistributionRequirement distributionRequirement;
 
-        int fsScalabilityRequirement;
+        ScalabilityRequirement scalabilityRequirement;
+    };
+
+
+    struct MyMntEntWScore {
+        MountPointAttribute::MyMntEnt mpEntry;
+        int score;
     };
 
 
@@ -94,29 +177,43 @@ namespace FastGlobalFileStat {
      *   Only one type of constructor is allowed to be called;
      *   an object of this type cannot be copied or assigned.
      */
-    class StorageClassifier {
+    class StorageClassifier : public GlobalFileStatusBase {
     public:
 
         /**
-         *   STORAGE_CLASSIFIER_MIN_SCORE -2.0
+         *   STORAGE_CLASSIFIER_MIN_SCORE -1
          *   Defines the minimum storage classifier score.
          */
-        const double STORAGE_CLASSIFIER_MIN_SCORE = -2.0;
+        static const int STORAGE_CLASSIFIER_REQ_UNMET_SCORE = -1;
 
         /**
          *   STORAGE_CLASSIFIER_MIN_MATCH_SCORE 0.0
          *   Defines the minimum storage classifier score
          *   for a storage that matches the criteria.
          */
-        const double STORAGE_CLASSIFIER_MIN_MATCH_SCORE = 0.0;
+        static const int STORAGE_CLASSIFIER_REQ_MET_SCORE = 0;
 
         /**
-         *   STORAGE_CLASSIFIER_BASE_DEVICE_SPEED 1.0
+         *   STORAGE_CLASSIFIER_MIN_MATCH_SCORE 0.0
+         *   Defines the minimum storage classifier score
+         *   for a storage that matches the criteria.
+         */
+        static const int STORAGE_CLASSIFIER_MAX_SCORE = 10000;
+
+        /**
+         *   STORAGE_CLASSIFIER_BASE_DEVICE_SPEED 1
          *   Defines the base device speed (storage's serial access).
          *   A device's speed would be a multiple (including 1x)
          *   of this value.
          */
-        const double STORAGE_CLASSIFIER_BASE_DEVICE_SPEED = 1.0;
+        static const int STORAGE_CLASSIFIER_BASE_DEVICE_SPEED = 1;
+
+        /**
+         *   STORAGE_CLASSIFIER_MAX_DEVICE_SPEED 1.0
+         *   Defines the base device speed (storage's serial access).
+         *   10x of STORAGE_CLASSIFIER_BASE_DEVICE_SPEED
+         */
+        static const int STORAGE_CLASSIFIER_MAX_DEVICE_SPEED = 10;
 
         /**
          *   STORAGE_CLASSIFIER_BASE_FS_SCALABILITY 1.0
@@ -124,48 +221,60 @@ namespace FastGlobalFileStat {
          *   scalability is defined to be a multiple (including 1x)
          *   of this value.
          */
-        const double STORAGE_CLASSIFIER_BASE_FS_SCALABILITY = 1.0;
+        static const int STORAGE_CLASSIFIER_BASE_FS_SCALABILITY = 1;
 
         /**
          *   StorageClassifier Ctor
-         *
-         *   @param[in] c CommFabric object
-         *   @param[in] net opaque network object
-         *   @param[out] dedicatedChannel opaque channle object
          *   @return none
          */
-        StorageClassifier(CommFabric *c,
-                          void *net=NULL,
-                          void *dedicatedChannel=NULL);
-
-        ~StorageClassifier();
+        StorageClassifier();
 
         /**
-         *   Examines all of the storage mounted across all of the
-         *   processes and computes the best stroage based on the
-         *   criteria specified through criteria. Only spaceRequirement
-         *   should be set in critiera.
+         *   StorageClassifier Dtor
          *
-         *   @param[in] criteria StorageCriteria object
-         *   @param[out] matchMnt a best mount point
-         *   @return MyMntEnt object that describes the best match
-         *           storage's mount point info.
+         *   @return none
          */
-        bool provideBestStorage(const StorageCriteria &criteria,
-                                MyMntEnt &matchMnt);
+        virtual ~StorageClassifier();
+
+        /**
+         *   Initializer
+         *
+         *   @param[in] c CommFabric object
+         *   @return a bool value
+         */
+        static bool initialize(CommLayer::CommFabric *c);
+
+        /**
+         *  Returns the static mount point classifier object which has
+         *  grouping information on all of the mount points
+         * 
+         */
+        static const MountPointsClassifier & getMountPointsClassifier();
 
         /**
          *   Examines all of the storage mounted across all of the
-         *   processes and find matching stroage based on the
-         *   criteria specified through criteria. Any of the optional
-         *   requirement can be given with this method.
+         *   processes and find matching storage based on the
+         *   criteria specified through the criteria object. Any of the optional
+         *   requirement can be given with this method. Returning mount
+         *   point vectors are in descending score order. Moint point with
+         *   a higher score is at the front of the vector.
+         *
+         *   Note that this method does not take into account quota and permission
+         *   in free disk space calculation. Users must make sure the quota and
+         *   permission don't keep them from writing data into the file system.
+         *   Also, the disk space calculation is based on the snapshot this
+         *   method takes. After the snapshot is taken, nothing prevents other processes
+         *   from writing data into the target file system significantly
+         *   reducing the free space significantly,
          *
          *   @param[in] criteria StorageCriteria object
-         *   @param[out] match containing matching mount points
+         *   @param[out] match containing matching mount points in descending 
+         *                     score order
          *   @return true if no error has been encountered
          */
-         bool provideMatchingStorage(const StorageCriteria &criteria,
-                                     std::vector<MyMntEnt> &match);
+        bool provideBestStorage(const StorageCriteria &criteria,
+                     std::vector<MyMntEntWScore> &match);
+
 
         /**
          *   Returns true if an error has been encountered. (During such as
@@ -173,26 +282,39 @@ namespace FastGlobalFileStat {
          */
         bool getHasErr()  const;
 
-    private:
 
-        StorageClassifier() {}
+    private:
 
         StorageClassifier(const StorageClassifier &) {}
 
-        bool initCommFabric(CommFabric *c, void *net=NULL,
-                          void *dedicatedChannel=NULL);
+        int scoreStorage(const std::string &pth,
+                     const GlobalProperties &gps,
+                     const StorageCriteria &criteria);
 
-        bool getGloballyAvailMntPoints(std::vector<std::string> &mntPoints) const;
+        int checkSpaceReq(const std::string &pth,
+                     const GlobalProperties &gps,
+                     const nbytes_t space,
+                     int *distEst);
 
-        bool hasErr;
+        int scoreWSpeedReq(const std::string &pth,
+                     const GlobalProperties &gps,
+                     const StorageCriteria::SpeedRequirement speed);
 
-        FgfsStatDesc parallelInfo;
+        int scoreWDistributionReq(const std::string &pth,
+                     const GlobalProperties &gps,
+                     const StorageCriteria::DistributionRequirement dist);
 
-        CommFabric *commFabric;
+        int scoreWScalabilityReq(const std::string &pth,
+                     const GlobalProperties &gps,
+                     const StorageCriteria::ScalabilityRequirement scale);
+
+        static MountPointsClassifier mMpClassifier;
+
+        bool mHasErr;
     };
 
   } // StorageInfo namespace
 
-} // FastGlobalFileStat namespace
+} // FastGlobalFileStatus namespace
 
 #endif // STORAGE_CLASSIFIER_H

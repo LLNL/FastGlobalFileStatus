@@ -17,7 +17,7 @@
 #include <mpi.h>
 #include "CommFabric.h"
 
-namespace FastGlobalFileStat {
+namespace FastGlobalFileStatus {
 
   namespace CommLayer {
 

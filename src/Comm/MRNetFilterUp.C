@@ -19,9 +19,9 @@
 #include "MountPointAttr.h"
 #include "MRNetCommFabric.h"
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::CommLayer;
-using namespace FastGlobalFileStat::MountPointAttribute;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::CommLayer;
+using namespace FastGlobalFileStatus::MountPointAttribute;
 using namespace MRN;
 
 FILE *mFilePtr = NULL;
@@ -447,6 +447,7 @@ void FGFSFilterUp(std::vector<PacketPtr> &in,
                 globalCount += count;
                 globalLen += valueLen; 
                 ucharVector.push_back(value);
+                ucharVector[i] = value;
                 lenVector.push_back(valueLen);
             }
 
@@ -454,7 +455,7 @@ void FGFSFilterUp(std::vector<PacketPtr> &in,
                 malloc(globalLen*sizeof(unsigned char)); 
             traverse = sendBuf;
 
-            for(i=0; i < ucharVector.size(); i++) {
+            for(i=0; i < lenVector.size(); i++) {
                 memcpy((void*)traverse, (void *) ucharVector[i], lenVector[i]);
                 //free(ucharVector[ix]);
                 //ucharVector[ix] = NULL;

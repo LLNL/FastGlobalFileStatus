@@ -7277,6 +7277,7 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([config/x_ac_enable_debug.m4])
+m4_include([config/x_ac_max_dist_degree.m4])
 m4_include([config/x_ac_mpa.m4])
 m4_include([config/x_ac_mrnet.m4])
 m4_include([config/x_find_mpi.m4])

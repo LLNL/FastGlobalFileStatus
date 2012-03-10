@@ -25,41 +25,49 @@ nobase_include_HEADERS    = Comm/DistDesc.h \
                             Comm/MPICommFabric.h \
                             Comm/MRNetCommFabric.h
 
-include_HEADERS           = AsyncFastGlobalFileStat.h \
+include_HEADERS           = FastGlobalFileStat.h \
                             SyncFastGlobalFileStat.h \
-                            FastGlobalFileStat.h \
+                            MountPointsClassifier.h \
+                            AsyncFastGlobalFileStat.h \
                             StorageClassifier.h
 
-libfgfs_mpi_la_SOURCES    = FastGlobalFileStat.C \
-                            SyncFastGlobalFileStat.C \
-                            AsyncFastGlobalFileStat.C \
-                            bloom.c \
+libfgfs_mpi_la_SOURCES    = bloom.c \
                             Comm/CommFabric.C \
                             Comm/DistDesc.C \
-                            Comm/MPICommFabric.C
+                            Comm/MPICommFabric.C \
+                            FastGlobalFileStat.C \
+                            SyncFastGlobalFileStat.C \
+                            MountPointsClassifier.C \
+                            AsyncFastGlobalFileStat.C \
+                            StorageClassifier.C
 
 libfgfs_mpi_la_CFLAGS     = $(AM_CFLAGS)
-libfgfs_mpi_la_CXXFLAGS   = $(MPI_CFLAGS) $(AM_CXXFLAGS) 
+libfgfs_mpi_la_CXXFLAGS   = $(MPI_CFLAGS) $(AM_CXXFLAGS)
 libfgfs_mpi_la_LDFLAGS    = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) $(MPI_CLDFLAGS) \
                             -version-info @FGFS_CURRENT@:@FGFS_REVISION@:@FGFS_AGE@
 
-libfgfs_mrnet_la_SOURCES  = FastGlobalFileStat.C \
-                            SyncFastGlobalFileStat.C \
-                            AsyncFastGlobalFileStat.C \
-                            bloom.c \
+#
+# StorageClassification is yet unavailable
+#
+libfgfs_mrnet_la_SOURCES  = bloom.c \
                             Comm/CommFabric.C \
                             Comm/DistDesc.C \
-                            Comm/MRNetCommFabric.C
+                            Comm/MRNetCommFabric.C \
+                            FastGlobalFileStat.C \
+                            SyncFastGlobalFileStat.C \
+                            MountPointsClassifier.C \
+                            AsyncFastGlobalFileStat.C
+
 libfgfs_mrnet_la_CFLAGS   = $(AM_CFLAGS)
-libfgfs_mrnet_la_CXXFLAGS = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS)
+libfgfs_mrnet_la_CXXFLAGS = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) -fpic
 libfgfs_mrnet_la_LDFLAGS  = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) $(MRNET_LDFLAGS) \
                             -version-info @FGFS_CURRENT@:@FGFS_REVISION@:@FGFS_AGE@
 
 libfgfs_filter_la_SOURCES = Comm/MRNetFilterUp.C \
                             Comm/MRNetFilterDown.C \
-                            Comm/DistDesc.C 
+                            Comm/DistDesc.C
 libfgfs_filter_la_CFLAGS  = $(AM_CFLAGS)
-libfgfs_filter_la_CXXFLAGS= $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) 
+libfgfs_filter_la_CXXFLAGS= $(MRNET_CXXFLAGS) $(AM_CXXFLAGS)
 libfgfs_filter_la_LDFLAGS = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) \
                             -version-info @FGFS_CURRENT@:@FGFS_REVISION@:@FGFS_AGE@
 

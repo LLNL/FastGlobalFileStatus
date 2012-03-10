@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ncore_per_node=12
-mach_name="sierra"
+ncore_per_node=16
+mach_name="zin"
 
 if [ $# -eq 1 ]
 then
@@ -12,7 +12,7 @@ fi
 app_names="ale3d ares kull"
 testers="async_stat_dso_mpi sync_stat_dso_mpi"
 fgfs_ops="0 1 2 3 4"
-taskscount="128 256 512 1024 2048 4096 8192 16384"
+taskscount="512 1024 2048 4096 8192 16384 32768"
 dir_ptr="FGFS.Scaling.mpi"
 rootpath=`pwd`
 

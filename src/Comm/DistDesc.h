@@ -21,7 +21,7 @@ extern "C" {
 #include <map>
 #include "FgfsCommon.h"
 
-namespace FastGlobalFileStat {
+namespace FastGlobalFileStatus {
 
   namespace CommLayer {
 
@@ -238,16 +238,16 @@ namespace FastGlobalFileStat {
         FgfsCount_t mGroupSize;
         FgfsId_t mRepInGroup;
 
-       /**
-        *    Reduction object for grouping
-        */
-       std::string mUriString;
-       std::map<std::string, ReduceDesc> groupingMap;
+        /**
+         *    Reduction object for grouping
+         */
+        std::string mUriString;
+        std::map<std::string, ReduceDesc> groupingMap;
     };
 
   } // CommLayer namespace
 
-} // FastGlobalFileStat namespace
+} // FastGlobalFileStatus namespace
 
 #endif // DIST_DESC_H
 

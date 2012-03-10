@@ -12,8 +12,8 @@
 
 #include "CommFabric.h"
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::CommLayer;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::CommLayer;
 
 ///////////////////////////////////////////////////////////////////
 //
@@ -23,7 +23,7 @@ using namespace FastGlobalFileStat::CommLayer;
 
 ///////////////////////////////////////////////////////////////////
 //
-//  PUBLIC INTERFACE:   namespace FastGlobalFileStat
+//  PUBLIC INTERFACE:   namespace FastGlobalFileStatus
 //
 //
 

@@ -14,6 +14,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -32,9 +33,9 @@ extern "C" {
 #include "AsyncFastGlobalFileStat.h"
 #include "FgfsTestGetDsoList.h"
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::MountPointAttribute;
-using namespace FastGlobalFileStat::CommLayer;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::MountPointAttribute;
+using namespace FastGlobalFileStatus::CommLayer;
 
 enum TestType {
     tt_is_unique = 0,
@@ -44,7 +45,8 @@ enum TestType {
     tt_unknown
 };
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 
     if (getenv("MPA_TEST_ENABLE_VERBOSE")) {
@@ -148,19 +150,19 @@ int main(int argc, char *argv[])
     uint32_t startTime;
     if (!rank) startTime = stampstart();
 
-    rc = AsyncGlobalFileStat::initialize(cfab);
+    rc = AsyncGlobalFileStatus::initialize(cfab);
 
     if (!rc) {
         MPA_sayMessage("TEST",
                        true,
-                       "AsyncGlobalFileStat::initialize returned false");
+                       "AsyncGlobalFileStatus::initialize returned false");
         MPI_Finalize();
         exit(1);
     }
 
     int nHit = 0;
     for (it = dRealpathLibs.begin(); it != dRealpathLibs.end(); it++) {
-        AsyncGlobalFileStat myStat((*it).c_str());
+        AsyncGlobalFileStatus myStat((*it).c_str());
 
         switch (tt) {
         case tt_is_unique:

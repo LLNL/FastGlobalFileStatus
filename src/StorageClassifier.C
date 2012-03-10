@@ -8,7 +8,7 @@
  *
  *        Jun 22 2011 DHA: File created. Moved StorageClassifier from
  *                         FastGlobalFileStat.h to put that service into an
- *                         independent module.
+ *                         independent class.
  *
  */
 
@@ -18,152 +18,36 @@ extern "C" {
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/vfs.h>
+#include <sys/statvfs.h>
 #include "bloom.h"
 }
 
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-#include "FastGlobalFileStat.h"
+#include <vector>
+#include <algorithm>
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::MountPointAttribute;
+#include "StorageClassifier.h"
+
+
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::MountPointAttribute;
+using namespace FastGlobalFileStatus::StorageInfo;
+using namespace FastGlobalFileStatus::CommLayer;
 
 ///////////////////////////////////////////////////////////////////
 //
 //  static data
 //
 //
+MountPointsClassifier StorageClassifier::mMpClassifier;
 
 ///////////////////////////////////////////////////////////////////
 //
 //  Public Interface
 //
 //
-
-///////////////////////////////////////////////////////////////////
-//
-//  class StorageClassifier
-//
-//
-
-StorageClassifier::StorageClassifier(CommFabric *c,
-                       void *net/*=NULL*/,
-                       void *dedicatedChannel/*=NULL*/)
-    : hasErr(false)
-{
-    if (!initCommFabric(c, net, dedicatedChannel)) {
-        hasErr = true;
-    }
-}
-
-
-StorageClassifier::~StorageClassifier()
-{
-    if (commFabric) {
-        delete commFabric;
-        commFabric = NULL;
-    }
-}
-
-bool
-StorageClassifier::provideBestStorage(
-                       const StorageCriteria &criteria,
-                       MyMntEnt &mme)
-{
-    std::vector<std::string> mntPoints;
-    GlobalFileStat *gfsObj = NULL;
-    int i = 0;
-    bool found = false;
-    double score = STORAGE_CLASSIFIER_MIN_SCORE;
-    double myScore;
-
-    if ((criteria.getSpaceRequirement() == StorageCriteria::NO_REQUIREMENT)
-       || !((criteria.getDistributionRequirement() == StorageCriteria::NO_REQUIREMENT)
-           &&(criteria.getSpeedRequirement() == StorageCriteria::NO_REQUIREMENT)
-           &&(criteria.getFsScalabilityRequirement()== StorageCriteria::NO_REQUIREMENT))) {
-
-        return found;
-    }
-
-
-    if (!getGloballyAvailMntPoints(mntPoints)) {
-        return found;
-    }
-
-    for (i=0; i < (int) mntPoints.size(); i++) {
-        //
-        // Test for each mount point
-        //
-        gfsObj = new GlobalFileStat(mntPoints[i].c_str(),
-                                    commFabric,
-                                    commFabric->getNet(),
-                                    commFabric->getChannel());
-
-        myScore = gfsObj->provideStorageClassification(criteria);
-
-        if (myScore > score) {
-            score = myScore;
-            //
-            // the MyMntEnt object is "copied" into mme
-            //
-            mme = gfsObj->getMyEntry();
-            found = true;
-        }
-
-        delete gfsObj;
-        gfsObj = NULL;
-    }
-
-    return found;
-}
-
-
-bool
-StorageClassifier::provideMatchingStorage(
-                                 const StorageCriteria &criteria,
-                                 std::vector<MyMntEnt> &match)
-{
-    std::vector<std::string> mntPoints;
-    GlobalFileStat *gfsObj = NULL;
-    int i = 0;
-    double score;
-
-
-    if ((criteria.getSpaceRequirement() == StorageCriteria::NO_REQUIREMENT)
-       || ((criteria.getDistributionRequirement() == StorageCriteria::NO_REQUIREMENT)
-           &&(criteria.getSpeedRequirement() == StorageCriteria::NO_REQUIREMENT)
-           &&(criteria.getFsScalabilityRequirement()== StorageCriteria::NO_REQUIREMENT))) {
-
-        return false;
-    }
-
-    if (!getGloballyAvailMntPoints(mntPoints)) {
-        return false;
-    }
-
-    for (i=0; i < (int) mntPoints.size(); i++) {
-
-        gfsObj = new GlobalFileStat(mntPoints[i].c_str(),
-                                    commFabric,
-                                    commFabric->getNet(),
-                                    commFabric->getChannel() );
-
-        score = gfsObj->provideStorageClassification(criteria);
-
-        if (score > STORAGE_CLASSIFIER_MIN_MATCH_SCORE) {
-            //
-            // This will make a copy of myMntEntry and apend
-            // it to the match vector.
-            match.push_back(gfsObj->getMyEntry());
-        }
-
-        delete gfsObj;
-        gfsObj = NULL;
-    }
-
-    return ((match.empty())? false : true); 
-}
 
 
 ///////////////////////////////////////////////////////////////////
@@ -173,13 +57,24 @@ StorageClassifier::provideMatchingStorage(
 //
 
 StorageCriteria::StorageCriteria()
-    : spaceRequirement(StorageCriteria::NO_REQUIREMENT),
-      spaceToFree(StorageCriteria::NO_REQUIREMENT),
-      speedRequirement(StorageCriteria::NO_REQUIREMENT),
-      distributionRequirement(StorageCriteria::NO_REQUIREMENT),
-      fsScalabilityRequirement(StorageCriteria::NO_REQUIREMENT)
+    : spaceRequirement(0),
+      speedRequirement(SPEED_REQUIRE_NONE),
+      distributionRequirement(DISTRIBUTED_REQUIRE_NONE),
+      scalabilityRequirement(FS_SCAL_REQUIRE_NONE)
 {
 
+}
+
+StorageCriteria::StorageCriteria(nbytes_t bytesNeeded,
+                                 nbytes_t bytesToFree,
+                                 SpeedRequirement speed,
+                                 DistributionRequirement dist,
+                                 ScalabilityRequirement scal)
+    : speedRequirement(speed),
+      distributionRequirement(dist),
+      scalabilityRequirement(scal)
+{
+    spaceRequirement = bytesNeeded - bytesToFree;
 }
 
 
@@ -189,64 +84,540 @@ StorageCriteria::StorageCriteria(const StorageCriteria &criteria)
     spaceToFree = criteria.spaceToFree;
     speedRequirement = criteria.speedRequirement;
     distributionRequirement = criteria.distributionRequirement;
-    fsScalabilityRequirement = criteria.fsScalabilityRequirement;
+    scalabilityRequirement = criteria.scalabilityRequirement;
 }
+
 
 StorageCriteria::~StorageCriteria()
 {
 
 }
 
-void 
-StorageCriteria::setSpaceRequirement(int64_t bytesNeeded, int64_t bytesToFree)
+
+void
+StorageCriteria::setSpaceRequirement(nbytes_t bytesNeeded,
+                                     nbytes_t bytesToFree)
 {
     spaceRequirement = bytesNeeded - bytesToFree;
 }
 
-void 
-StorageCriteria::setDistributionRequirement(int distDegree)
+
+void
+StorageCriteria::setDistributionRequirement(
+                     StorageCriteria::DistributionRequirement dist)
 {
-    distributionRequirement = distDegree;
+    distributionRequirement = dist;
 }
 
-void 
-StorageCriteria::setSpeedRequirement(int speedReq)
+
+void
+StorageCriteria::setSpeedRequirement(
+                     StorageCriteria::SpeedRequirement speed)
 {
-    speedRequirement = speedReq;
+    speedRequirement = speed;
 }
 
-void 
-StorageCriteria::setFsScalabilityRequirement(int scalReq)
+
+void
+StorageCriteria::setScalabilityRequirement(
+                     StorageCriteria::ScalabilityRequirement scale)
 {
-     fsScalabilityRequirement = scalReq;
+     scalabilityRequirement = scale;
 }
 
-const int64_t 
+
+const StorageCriteria::SpaceRequirement
 StorageCriteria::getSpaceRequirement() const
 {
     return spaceRequirement;
 }
 
-const int64_t 
+
+const nbytes_t
 StorageCriteria::getSpaceToFree() const
 {
     return spaceToFree;
 }
 
-const int 
+
+const StorageCriteria::DistributionRequirement
 StorageCriteria::getDistributionRequirement() const
 {
     return distributionRequirement;
 }
 
-const int 
+
+const StorageCriteria::SpeedRequirement
 StorageCriteria::getSpeedRequirement() const
 {
     return speedRequirement;
 }
 
-const int 
-StorageCriteria::getFsScalabilityRequirement() const
+
+const StorageCriteria::ScalabilityRequirement
+StorageCriteria::getScalabilityRequirement() const
 {
-    return fsScalabilityRequirement;
+    return scalabilityRequirement;
+}
+
+
+bool
+StorageCriteria::isRequireNone() const
+{
+    bool rc = false; 
+
+    if ( (speedRequirement == SPEED_REQUIRE_NONE)
+         && (distributionRequirement == DISTRIBUTED_REQUIRE_NONE)
+         && (scalabilityRequirement == FS_SCAL_REQUIRE_NONE) ) {
+        rc = true;
+    }
+
+    return rc;
+}
+
+
+///////////////////////////////////////////////////////////////////
+//
+//  class StorageGlobalFileStatus
+//
+//
+
+StorageGlobalFileStatus::StorageGlobalFileStatus(const char *pth)
+    : SyncGlobalFileStatus(pth)
+{
+
+}
+
+
+StorageGlobalFileStatus::StorageGlobalFileStatus(const char *pth, const int value)
+    : SyncGlobalFileStatus(pth, value)
+{
+
+}
+
+
+StorageGlobalFileStatus::~StorageGlobalFileStatus()
+{
+    // fileSigniture must not be deleted
+}
+
+
+bool
+StorageGlobalFileStatus::initialize(CommFabric *c)
+{
+    return (SyncGlobalFileStatus::initialize(NULL, c));
+}
+
+
+FGFSInfoAnswer
+StorageGlobalFileStatus::meetSpaceRequirement(nbytes_t BytesNeededlocally,
+                               nbytes_t *BytesNeededGlobally,
+                               nbytes_t *BytesNeededWithinGroup,
+                               nbytes_t *BytesAvailableWithinGroup,
+                               int *distEst)
+{
+
+    FGFSInfoAnswer rcAns = ans_error;
+    struct statvfs statFsBuf;
+    int rc = 0;
+    int rcvRc = 0;
+    ReduceDataType rdt = REDUCE_LONG_LONG_INT;
+
+    if (IS_NO(getParallelInfo().isGroupingDone())) {
+        //
+        // TODO: You want this to be generalized comm.-split later.
+        //
+        if (!computeParallelInfo((GlobalFileStatusAPI *) this)) {
+            rcAns = ans_error;
+            if (ChkVerbose(1)) {
+                MPA_sayMessage("SyncGlobalFileStatus",
+                    true,
+                    "Error returned from computeParallelInfo for isUnique");
+            }
+            goto has_error;
+        }
+
+        //
+        // Actual grouping including the node-local case.
+        //
+        (*distEst) = getParallelInfo().getSize() / (getParallelInfo().getNumOfGroups());
+    }
+
+
+   if (IS_YES(getParallelInfo().isRep())) {
+       //
+       // Only group repr performs statfs
+       // Note that we do this on dir_branch, which in most cases
+       // will be identical as dir_master normally except for
+       // some "stacked" file systems like union fs.
+       //
+       rc = statvfs(getMyEntry().dir_branch.c_str(), &statFsBuf);
+   }
+
+   if (!(getCommFabric()->allReduce(true,
+                                    getParallelInfo(),
+                                    &rc,
+                                    &rcvRc,
+                                    1,
+                                    REDUCE_INT,
+                                    REDUCE_SUM))) {
+
+        if (ChkVerbose(1)) {
+            MPA_sayMessage("StorageGlobalFileStatus",
+                true,
+                "Error returned from allReduce");
+        }
+
+        goto has_error;
+    }
+
+    if (rcvRc) {
+        // If non-zero return values from stat have been seen
+        // error
+        if (ChkVerbose(1)) {
+            MPA_sayMessage("StorageGlobalFileStatus",
+                true,
+                "Error in rcvRc; one or more representatives calling statfs failed.");
+        }
+
+        goto has_error;
+    }
+
+    if (sizeof(BytesNeededlocally) == 4) {
+        rdt = REDUCE_INT;
+    }
+
+    if (!(getCommFabric()->allReduce(true,
+                                     getParallelInfo(),
+                                     &BytesNeededlocally,
+                                     BytesNeededGlobally,
+                                     1,
+                                     rdt,
+                                     REDUCE_SUM))) {
+
+         if (ChkVerbose(1)) {
+             MPA_sayMessage("StorageGlobalFileStatus",
+                 true,
+                 "Error returned from allReduce");
+         }
+
+         goto has_error;
+     }
+
+    if (!(getCommFabric()->allReduce(false,
+                                     getParallelInfo(),
+                                     &BytesNeededlocally,
+                                     BytesNeededWithinGroup,
+                                     1,
+                                     rdt,
+                                     REDUCE_SUM))) {
+
+         if (ChkVerbose(1)) {
+             MPA_sayMessage("StorageGlobalFileStatus",
+                 true,
+                 "Error returned from allReduce");
+         }
+
+         goto has_error;
+     }
+
+    if (!(getCommFabric()->broadcast(false,
+                                     getParallelInfo(),
+                                     (unsigned char*) &statFsBuf,
+                                     sizeof(statFsBuf)))) {
+        if (ChkVerbose(1)) {
+            MPA_sayMessage("StorageGlobalFileStatus",
+                true,
+                "Error in group broadcast");
+        }
+
+        goto has_error;
+    }
+
+    (*BytesAvailableWithinGroup) = 0;
+    if (!(statFsBuf.f_flag & ST_RDONLY)) {
+        (*BytesAvailableWithinGroup) = statFsBuf.f_bavail * statFsBuf.f_bsize;
+    }
+
+    rc = (*BytesAvailableWithinGroup >= *BytesNeededWithinGroup)? 0 : 1;
+
+    if (!(getCommFabric()->allReduce(true,
+                                     getParallelInfo(),
+                                     &rc,
+                                     &rcvRc,
+                                     1,
+                                     REDUCE_INT,
+                                     REDUCE_MAX))) {
+
+        if (ChkVerbose(1)) {
+            MPA_sayMessage("StorageGlobalFileStatus",
+                true,
+                "Error returned from allReduce");
+        }
+
+        goto has_error;
+    }
+
+    rcAns = (rcvRc)? ans_no : ans_yes;
+
+has_error:
+    return rcAns;
+}
+
+
+///////////////////////////////////////////////////////////////////
+//
+//  class StorageClassifier
+//
+//
+
+
+StorageClassifier::StorageClassifier( )
+    : mHasErr(false)
+{
+
+}
+
+
+StorageClassifier::~StorageClassifier()
+{
+
+}
+
+
+bool
+StorageClassifier::initialize(CommLayer::CommFabric *c)
+{
+    bool rc;
+    if (rc = StorageGlobalFileStatus::initialize(c)) {
+        rc = mMpClassifier.runClassification(c);
+    }
+    return rc;
+}
+
+
+bool sortPredicate(const MyMntEntWScore &d1, const MyMntEntWScore &d2)
+{
+    return d1.score > d2.score;
+}
+
+
+bool
+StorageClassifier::provideBestStorage(const StorageCriteria &criteria,
+                       std::vector<MyMntEntWScore> &match)
+{
+    int i = 0;
+    bool found = false;
+    int score = STORAGE_CLASSIFIER_REQ_UNMET_SCORE;
+    int myScore;
+    std::string matchedPath = "";
+
+    std::map<std::string, GlobalProperties>::const_iterator iter;
+    for (iter = mMpClassifier.mAnnoteMountPoints.begin();
+             iter != mMpClassifier.mAnnoteMountPoints.end(); ++iter) {
+
+        myScore = scoreStorage(iter->first, iter->second, criteria);
+        if (myScore > STORAGE_CLASSIFIER_REQ_UNMET_SCORE) {
+            MyMntEntWScore tmpEnt;
+            tmpEnt.score = myScore;
+            matchedPath = iter->first;
+            found = true;
+            getMpInfo().getMntPntInfo2(matchedPath.c_str(), tmpEnt.mpEntry);
+            match.push_back(tmpEnt);
+        }
+    }
+
+    sort(match.begin(), match.end(), sortPredicate);
+
+    return found;
+}
+
+
+const MountPointsClassifier &
+StorageClassifier::getMountPointsClassifier() 
+{
+    return mMpClassifier;    
+}
+
+
+///////////////////////////////////////////////////////////////////
+//
+//  Private Interface
+//
+//
+
+
+int
+StorageClassifier::scoreStorage(const std::string &pth,
+                                const GlobalProperties &gps,
+                                const StorageCriteria &criteria)
+{
+    //
+    // Score for the spaceReq: if space not there, all bets are off
+    //     if storage meets the space requirement goto next
+    //
+    int distEst;
+    int score = checkSpaceReq(pth, gps, criteria.getSpaceRequirement(), &distEst);
+
+    if (score == STORAGE_CLASSIFIER_REQ_MET_SCORE) {
+
+        if (!criteria.isRequireNone()) {
+            //
+            // Some criteria have been give. This means
+            // Score becomes MEET (zero) vs. UNMEET(negative)
+            //
+            score += scoreWSpeedReq(pth, gps, criteria.getSpeedRequirement());
+            score += scoreWDistributionReq(pth, gps, criteria.getDistributionRequirement());
+            score += scoreWScalabilityReq(pth, gps, criteria.getScalabilityRequirement());
+        }
+        else {
+            //
+            // a simple score function
+            //
+            float ratio = 1.0;
+            float floatScore = 0.0;
+            ratio = (float) gps.getFsScalability()
+                                /( (float) ((gps.getFsScalability() > distEst)?
+                                            (float) gps.getFsScalability()
+                                            : (float) distEst));
+
+
+            floatScore = ratio * (((float)gps.getFsSpeed())/((float)STORAGE_CLASSIFIER_MAX_DEVICE_SPEED));
+            floatScore *= (float) STORAGE_CLASSIFIER_MAX_SCORE;
+            score = (int) floatScore;
+        }
+    }
+
+    return score;
+}
+
+
+int
+StorageClassifier::checkSpaceReq(const std::string &pth,
+                       const GlobalProperties &gps,
+                       const nbytes_t space,
+                       int *distEst)
+{
+    int score = STORAGE_CLASSIFIER_REQ_UNMET_SCORE;
+    nbytes_t bytesNeededGlobally;
+    nbytes_t bytesNeededWithinGroup;
+    nbytes_t bytesAvailableWithinGroup;
+
+    StorageGlobalFileStatus sgf(pth.c_str());
+
+    sgf.triage();
+
+    FGFSInfoAnswer ans = sgf.meetSpaceRequirement(space,
+                             &bytesNeededGlobally,
+                             &bytesNeededWithinGroup,
+                             &bytesAvailableWithinGroup,
+                             distEst);
+
+    if (IS_YES(ans)) {
+        score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+    }
+
+    return score;
+}
+
+
+int
+StorageClassifier::scoreWSpeedReq(const std::string &pth,
+                       const GlobalProperties &gps,
+                       const StorageCriteria::SpeedRequirement speed)
+{
+    int score = STORAGE_CLASSIFIER_REQ_UNMET_SCORE;
+
+    switch (speed) {
+    case StorageCriteria::SPEED_REQUIRE_NONE:
+        score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        break;
+
+    case StorageCriteria::SPEED_LOW:
+        if (gps.getFsSpeed() == BASE_FS_SPEED) {
+            score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        }
+        break;
+
+    case StorageCriteria::SPEED_HIGH:
+        if (gps.getFsSpeed() > BASE_FS_SPEED) {
+            score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return score;
+}
+
+
+int
+StorageClassifier::scoreWDistributionReq(const std::string &pth,
+                       const GlobalProperties &gps,
+                       const StorageCriteria::DistributionRequirement dist)
+{
+    int score = STORAGE_CLASSIFIER_REQ_UNMET_SCORE;
+
+    switch (dist) {
+    case StorageCriteria::DISTRIBUTED_REQUIRE_NONE:
+        score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        break;
+
+    case StorageCriteria::DISTRIBUTED_UNIQUE:
+        if (gps.getUnique()) {
+            score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        }
+        break;
+
+    case StorageCriteria::DISTRIBUTED_LOW:
+        if (gps.getPoorlyDist()) {
+            score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        }
+        break;
+
+    case StorageCriteria::DISTRIBUTED_HIGH:
+        if (gps.getWellDist()) {
+            score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return score;
+}
+
+
+int
+StorageClassifier::scoreWScalabilityReq(const std::string &pth,
+                       const GlobalProperties &gps,
+                       const StorageCriteria::ScalabilityRequirement scale)
+{
+    int score = STORAGE_CLASSIFIER_REQ_UNMET_SCORE;
+
+    switch (scale) {
+    case StorageCriteria::FS_SCAL_REQUIRE_NONE:
+        score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        break;
+
+    case StorageCriteria::FS_SCAL_SINGLE:
+        if (gps.getFsScalability() == BASE_FS_SCALABILITY) {
+            score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        }
+        break;
+
+    case StorageCriteria::FS_SCAL_MULTI:
+        if (gps.getFsScalability() > BASE_FS_SCALABILITY) {
+            score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return score;
 }

@@ -23,7 +23,7 @@ extern "C" {
 #include <vector>
 #include <string>
 
-namespace FastGlobalFileStat {
+namespace FastGlobalFileStatus {
 
   namespace CommLayer {
 
@@ -245,6 +245,6 @@ namespace FastGlobalFileStat {
 
   } // CommLayer namespace
 
-} // FastGlobalFileStat namespace
+} // FastGlobalFileStatus namespace
 #endif //MRNET_COMM_FABRIC_H
 

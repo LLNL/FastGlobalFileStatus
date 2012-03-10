@@ -14,47 +14,14 @@
 #define ASYNC_FAST_GLOBAL_FILE_STAT_H 1
 
 #include "SyncFastGlobalFileStat.h"
+#include "MountPointsClassifier.h"
 
-namespace FastGlobalFileStat {
-
-    /**
-     *   Allows asynchronous abstraction to annote each and all of
-     *   mount points
-     */
-    class GlobalProperties {
-    public:
-        GlobalProperties();
-        GlobalProperties(const GlobalProperties &lhs);
-        ~GlobalProperties();
-
-        const FGFSInfoAnswer getUnique() const;
-        const FGFSInfoAnswer getPoorlyDist() const;
-        const FGFSInfoAnswer getWellDist() const;
-        const FGFSInfoAnswer getFullyDist() const;
-        const FGFSInfoAnswer getConsistent() const;
-        CommLayer::FgfsParDesc & getParDesc();
-
-        void setUnique(FGFSInfoAnswer v);
-        void setPoorlyDist(FGFSInfoAnswer v);
-        void setWellDist(FGFSInfoAnswer v);
-        void setFullyDist(FGFSInfoAnswer v);
-        void setConsistent(FGFSInfoAnswer v);
-        void setParDesc(const CommLayer::FgfsParDesc pd);
-
-    private:
-        FGFSInfoAnswer mUnique;
-        FGFSInfoAnswer mPoorlyDist;
-        FGFSInfoAnswer mWellDist;
-        FGFSInfoAnswer mFullyDist;
-        FGFSInfoAnswer mConsistent;
-        CommLayer::FgfsParDesc mParDesc;
-    };
-
+namespace FastGlobalFileStatus {
 
     /**
-     *   Provides synchronous abstractions of Fast Global File Stat. 
+     *   Provides asynchronous abstractions of Fast Global File Stat.
      */
-    class AsyncGlobalFileStat : public GlobalFileStatBase {
+    class AsyncGlobalFileStatus : public GlobalFileStatusAPI, public GlobalFileStatusBase {
     public:
 
         /**
@@ -63,7 +30,7 @@ namespace FastGlobalFileStat {
          *   @param[in] pth an absolute path with no links to a file
          *   @return none
          */
-        AsyncGlobalFileStat(const char *pth);
+        AsyncGlobalFileStatus(const char *pth);
 
         /**
          *   SyncGlobalFileStat Ctor
@@ -74,9 +41,9 @@ namespace FastGlobalFileStat {
          *                         the default threshold.
          *   @return none
          */
-        AsyncGlobalFileStat(const char *pth, const int threshold);
+        AsyncGlobalFileStatus(const char *pth, const int threshold);
 
-        virtual ~AsyncGlobalFileStat();
+        virtual ~AsyncGlobalFileStatus();
 
         /**
          *   Initializer
@@ -121,9 +88,9 @@ namespace FastGlobalFileStat {
          */
         virtual FGFSInfoAnswer isUnique();
 
-
     private:
-        static std::map<std::string, GlobalProperties> mAnnoteMountPoints;
+
+        static MountPointsClassifier mMpClassifier;
     };
 
 }

@@ -24,9 +24,9 @@ extern "C" {
 #include <stdexcept>
 #include "SyncFastGlobalFileStat.h"
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::MountPointAttribute;
-using namespace FastGlobalFileStat::CommLayer;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::MountPointAttribute;
+using namespace FastGlobalFileStatus::CommLayer;
 
 
 ///////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ using namespace FastGlobalFileStat::CommLayer;
 //  static data
 //
 //
-FileSignitureGen *SyncGlobalFileStat::fileSignitureGen = NULL;
+FileSignitureGen *SyncGlobalFileStatus::fileSignitureGen = NULL;
 
 
 ///////////////////////////////////////////////////////////////////
@@ -45,41 +45,41 @@ FileSignitureGen *SyncGlobalFileStat::fileSignitureGen = NULL;
 
 ///////////////////////////////////////////////////////////////////
 //
-//  class SyncGlobalFileStat
+//  class SyncGlobalFileStatus
 //
 //
 
-SyncGlobalFileStat::SyncGlobalFileStat(const char *pth)
-    : GlobalFileStatBase(pth)
+SyncGlobalFileStatus::SyncGlobalFileStatus(const char *pth)
+    : GlobalFileStatusAPI(pth), GlobalFileStatusBase()
 {
 
 }
 
 
-SyncGlobalFileStat::SyncGlobalFileStat(const char *pth, const int value)
-    : GlobalFileStatBase(pth, value)
+SyncGlobalFileStatus::SyncGlobalFileStatus(const char *pth, const int value)
+    : GlobalFileStatusAPI(pth), GlobalFileStatusBase(value)
 {
 
 }
 
 
-SyncGlobalFileStat::~SyncGlobalFileStat()
+SyncGlobalFileStatus::~SyncGlobalFileStatus()
 {
     // fileSigniture must not be deleted
 }
 
 
 bool
-SyncGlobalFileStat::initialize(FileSignitureGen *fsg,
+SyncGlobalFileStatus::initialize(FileSignitureGen *fsg,
                                CommFabric *c)
 {
     fileSignitureGen = fsg;
-    return (GlobalFileStatBase::initialize(c));
+    return (GlobalFileStatusBase::initialize(c));
 }
 
 
 bool
-SyncGlobalFileStat::triage(CommAlgorithms algo)
+SyncGlobalFileStatus::triage(CommAlgorithms algo)
 {
     int rank, size;
     bool isMaster;
@@ -98,19 +98,19 @@ SyncGlobalFileStat::triage(CommAlgorithms algo)
         getParallelInfo().unsetGlobalMaster();
     }
 
-    return computeCardinalityEst(algo);
+    return computeCardinalityEst((GlobalFileStatusAPI *)this, algo);
 }
 
 
 FGFSInfoAnswer
-SyncGlobalFileStat::isFullyDistributed() const
+SyncGlobalFileStatus::isFullyDistributed() const
 {
     return (isNodeLocal())? ans_yes : ans_no;
 }
 
 
 FGFSInfoAnswer
-SyncGlobalFileStat::isWellDistributed() const
+SyncGlobalFileStatus::isWellDistributed() const
 {
     FGFSInfoAnswer answer = isPoorlyDistributed();
     if (IS_NO(answer)) {
@@ -125,7 +125,7 @@ SyncGlobalFileStat::isWellDistributed() const
 
 
 FGFSInfoAnswer
-SyncGlobalFileStat::isPoorlyDistributed() const
+SyncGlobalFileStatus::isPoorlyDistributed() const
 {
     FGFSInfoAnswer answer = ans_no;
 
@@ -134,7 +134,7 @@ SyncGlobalFileStat::isPoorlyDistributed() const
     }
     else if (getCardinalityEst() == FGFS_NOT_FILLED) {
         if (ChkVerbose(1)) {
-            MPA_sayMessage("SyncGlobalFileStat",
+            MPA_sayMessage("SyncGlobalFileStatus",
                 true,
                 "Cardinality Est. isn't known; has triage not been called?");
         }
@@ -146,7 +146,7 @@ SyncGlobalFileStat::isPoorlyDistributed() const
 
 
 FGFSInfoAnswer
-SyncGlobalFileStat::isUnique()
+SyncGlobalFileStatus::isUnique()
 {
     FGFSInfoAnswer answer = ans_no;
     if (IS_YES(isPoorlyDistributed())
@@ -155,10 +155,10 @@ SyncGlobalFileStat::isUnique()
             //
             // parallel info grouping has not been executed
             //
-            if (!computeParallelInfo()) {
+            if (!computeParallelInfo((GlobalFileStatusAPI *) this)) {
                 answer = ans_error;
                 if (ChkVerbose(1)) {
-                    MPA_sayMessage("SyncGlobalFileStat",
+                    MPA_sayMessage("SyncGlobalFileStatus",
                         true,
                         "Error returned from computeParallelInfo for isUnique");
                 }
@@ -177,7 +177,7 @@ return_location:
 
 
 FGFSInfoAnswer 
-SyncGlobalFileStat::isConsistent(bool serial/*=false*/)
+SyncGlobalFileStatus::isConsistent(bool serial/*=false*/)
 {
     FGFSInfoAnswer answer = ans_no;
     struct stat sb;
@@ -192,7 +192,7 @@ SyncGlobalFileStat::isConsistent(bool serial/*=false*/)
             if (!(mySig = signiture(&sb, &sigSize))) {
                 answer = ans_error;
                 if (ChkVerbose(1)) {
-                    MPA_sayMessage("SyncGlobalFileStat",
+                    MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "signiture couldn't be computed");
                 }
@@ -203,7 +203,7 @@ SyncGlobalFileStat::isConsistent(bool serial/*=false*/)
             if (!(mySig = signitureSerial(&sb, &sigSize))) {
                 answer = ans_error;
                 if (ChkVerbose(1)) {
-                    MPA_sayMessage("SyncGlobalFileStat",
+                    MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "signitureSerial couldn't be computed");
                 }
@@ -216,7 +216,7 @@ SyncGlobalFileStat::isConsistent(bool serial/*=false*/)
         if (!sigCopy) {
             answer = ans_error;
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "out of memory!");
             }
@@ -230,7 +230,7 @@ SyncGlobalFileStat::isConsistent(bool serial/*=false*/)
                                         (FgfsCount_t) sigSize)) {
             answer = ans_error;
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "comm fabric returns an error");
             }
@@ -261,7 +261,7 @@ SyncGlobalFileStat::isConsistent(bool serial/*=false*/)
                                         REDUCE_INT, REDUCE_MAX)) {
             answer = ans_error;
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "Error returned from globalAllReduceIntMAX");
             }
@@ -279,7 +279,7 @@ return_location:
 
 
 unsigned char *
-SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
+SyncGlobalFileStatus::signiture(struct stat *sb, int *sigSize)
 {
     unsigned char *retbuf = NULL;
     int fd = -1;
@@ -289,7 +289,7 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
 
     if (!fileSignitureGen) {
         if (ChkVerbose(1)) {
-            MPA_sayMessage("SyncGlobalFileStat",
+            MPA_sayMessage("SyncGlobalFileStatus",
                 true,
                 "fileSignitureGen has not been registered");
         }
@@ -304,9 +304,9 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
             //
             // parallel info grouping has not been executed
             //
-            if (!computeParallelInfo()) {
+            if (!computeParallelInfo((GlobalFileStatusAPI *) this)) {
                 if (ChkVerbose(1)) {
-                    MPA_sayMessage("SyncGlobalFileStat",
+                    MPA_sayMessage("SyncGlobalFileStatus",
                         true,
                         "Error returned from computeParallelInfo");
                 }
@@ -350,9 +350,9 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
                                          REDUCE_SUM))) {
 
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
-                    "Error returned from globalAllReduceIntSUM");
+                    "Error returned from allReduce");
             }
             goto has_error;
         }
@@ -361,7 +361,7 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
             // If non-zero return values from stat have been seen
             // error
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "Error in rcvRc; one or more representatives calling stat failed.");
             }
@@ -374,7 +374,7 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
                                          (unsigned char*) sb,
                                          sizeof(*sb)))) {
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "Error in groupBroadcastBytes");
             }
@@ -388,7 +388,7 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
                                          sizeof(*sigSize)))) {
 
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "Error in groupBroadcastBytes 2");
             }
@@ -405,7 +405,7 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
                                          retbuf,
                                          *sigSize))) {
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "Error in groupBroadcastBytes 3");
             }
@@ -423,7 +423,7 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
 
         if (!S_ISREG(sb->st_mode) || !(S_IRUSR & sb->st_mode)) {
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "not a regular file");
             }
@@ -432,7 +432,7 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
 
         if ( (fd = open(getPath(), O_RDONLY)) < 0) {
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "open failed");
             }
@@ -445,7 +445,7 @@ SyncGlobalFileStat::signiture(struct stat *sb, int *sigSize)
 
         if  (!retbuf || !sigSize) {
             if (ChkVerbose(1)) {
-                MPA_sayMessage("SyncGlobalFileStat",
+                MPA_sayMessage("SyncGlobalFileStatus",
                     true,
                     "signiture generation failed");
             }
@@ -464,7 +464,7 @@ has_error:
 
 
 unsigned char *
-SyncGlobalFileStat::signitureSerial(struct stat *sb, int *sigSize)
+SyncGlobalFileStatus::signitureSerial(struct stat *sb, int *sigSize)
 {
     unsigned char *retbuf = NULL;
     int fd = -1;
@@ -474,7 +474,7 @@ SyncGlobalFileStat::signitureSerial(struct stat *sb, int *sigSize)
 
     if (!fileSignitureGen) {
         if (ChkVerbose(1)) {
-            MPA_sayMessage("SyncGlobalFileStat",
+            MPA_sayMessage("SyncGlobalFileStatus",
                 true,
                 "fileSignitureGen isn't registered");
         }
@@ -484,7 +484,7 @@ SyncGlobalFileStat::signitureSerial(struct stat *sb, int *sigSize)
 
     if (stat(getPath(), sb) < 0) {
         if (ChkVerbose(1)) {
-            MPA_sayMessage("SyncGlobalFileStat",
+            MPA_sayMessage("SyncGlobalFileStatus",
                 true,
                 "stat failed");
         }
@@ -494,7 +494,7 @@ SyncGlobalFileStat::signitureSerial(struct stat *sb, int *sigSize)
 
     if (!S_ISREG(sb->st_mode) || !(S_IRUSR & sb->st_mode)) {
         if (ChkVerbose(1)) {
-            MPA_sayMessage("SyncGlobalFileStat",
+            MPA_sayMessage("SyncGlobalFileStatus",
                 true,
                 "not a regular file");
         }
@@ -504,7 +504,7 @@ SyncGlobalFileStat::signitureSerial(struct stat *sb, int *sigSize)
 
     if ( (fd = open(getPath(), O_RDONLY)) < 0) {
         if (ChkVerbose(1)) {
-            MPA_sayMessage("SyncGlobalFileStat",
+            MPA_sayMessage("SyncGlobalFileStatus",
                 true,
                 "open failed");
         }
@@ -515,7 +515,7 @@ SyncGlobalFileStat::signitureSerial(struct stat *sb, int *sigSize)
     retbuf = fileSignitureGen->signiture(fd, (int)sb->st_size, sigSize);
     if  (!retbuf || !sigSize) {
         if (ChkVerbose(1)) {
-            MPA_sayMessage("SyncGlobalFileStat",
+            MPA_sayMessage("SyncGlobalFileStatus",
                 true,
                 "signiture generation failed");
         }
@@ -532,163 +532,24 @@ has_error:
 }
 
 
-#if 0
-const double
-SyncGlobalFileStat::provideStorageClassification (
-                    const StorageCriteria &criteria) 
+bool
+SyncGlobalFileStatus::forceComputeParallelInfo()
 {
-    //
-    // I'll think about this later
-    //
-    struct statfs sb;
-    double score = STORAGE_CLASSIFIER_MIN_SCORE + 1.0;
-    int rc = 0;
-    int rcvRc = 0;
-    int insufficient = 0;
-    int rcvInsu = 0;
-    int64_t spaceNeeded = criteria.getSpaceRequirement()
-                          - criteria.getSpaceToFree();
-    int64_t aggregateSize = 0;
-
-    if (!computeParallelInfo()) {
-        goto has_error;
-    }
-
-    if (!(getCommFabric()->groupAllReduceInt64SUM(parallelInfo,
-                          &spaceNeeded, &aggregateSize))) {
-        std::cerr << "Error in groupAllReduceInt64SUM" << std::endl;
-        goto has_error;
-    }
-
-    if (IS_YES(parallelInfo.isRep())) {
-        rc = statfs(getPath(), &sb);
-        if (!(rc < 0)) {
-            if ( (int64_t)(sb.f_bavail * sb.f_bsize) < aggregateSize ) {
-                insufficient = 1;
+    bool rc = true;
+    if (IS_NO(getParallelInfo().isGroupingDone())) {
+        //
+        // parallel info grouping has not been executed
+        //
+        if (!computeParallelInfo((GlobalFileStatusAPI *) this)) {
+            if (ChkVerbose(1)) {
+                MPA_sayMessage("SyncGlobalFileStatus",
+                    true,
+                    "Error returned from computeParallelInfo");
             }
+            rc = false;
         }
     }
 
-    if (!(getCommFabric()->globalAllReduceIntSUM(&rc, &rcvRc))) {
-        std::cerr << "Error in globalAllReduceIntSUM" << std::endl;
-        goto has_error;
-    }
-
-    if (!(commFabric->globalAllReduceIntMAX(&insufficient, &rcvInsu))) {
-        std::cerr << "Error in globalAllReduceIntMAX" << std::endl;
-        goto has_error;
-    }
-
-    if (rcvInsu != 0) {
-        if ( (criteria.getDistributionRequirement() ==  StorageCriteria::NO_REQUIREMENT)
-             && (criteria.getSpeedRequirement() ==  StorageCriteria::NO_REQUIREMENT)
-             && (criteria.getFsScalabilityRequirement() ==  StorageCriteria::NO_REQUIREMENT)) {
-            //
-            // No requirement is given except for spaceRequirement
-            // In this case, we use a built-in scoring system 
-            //
-            double deviceSpeed = STORAGE_CLASSIFIER_BASE_DEVICE_SPEED;
-            if (IS_YES(isFullyDistributed())) {
-                // TODO: Assume for a moment that a local device is 4x faster
-                // than a remote
-                deviceSpeed *= 4.0;
-            }
-
-            double fsScale = STORAGE_CLASSIFIER_BASE_FS_SCALABILITY;
-            if (mpInfo.determineFSType(myEntry.type) == fs_lustre) {
-                // TODO: Assume for a moment that lustre has 6x better scalability
-                // than a non-parallel device
-                fsScale *= 6.0;
-            }
-
-            double sharedDegree = ((double)parallelInfo.size)/((double)cardinalityEst);
-            score = STORAGE_CLASSIFIER_MIN_MATCH_SCORE
-                    + (deviceSpeed / (sharedDegree/fsScale));
-        }
-        else {
-            //
-            // In this case, we test one set requirement at a time
-            //
-            score = STORAGE_CLASSIFIER_MIN_MATCH_SCORE;
-
-            if (criteria.getDistributionRequirement() !=  StorageCriteria::NO_REQUIREMENT) {
-                switch(criteria.getDistributionRequirement()) {
-                case StorageCriteria::DISTRIBUTED_NONE:
-                    if (!IS_YES(isUnique())) {
-                        score -= 1.0;
-                    }
-                    break;
-                case StorageCriteria::DISTRIBUTED_LOW:
-                    if (!IS_YES(isPoorlyDistributed())) {
-                        score -= 1.0;
-                    }
-                    break;
-                case StorageCriteria::DISTRIBUTED_HIGH:
-                    if (!IS_YES(isWellDistributed())) {
-                        score -= 1.0;
-                    }
-                    break;
-                case StorageCriteria::DISTRIBUTED_FULL:
-                    if (!IS_YES(isFullyDistributed())) {
-                        score -= 1.0;
-                    }
-                    break;
-                default:
-                    score -= 1.0;
-                    break;
-                }
-            }
-
-            if ((score > (STORAGE_CLASSIFIER_MIN_MATCH_SCORE-0.5))
-                && (criteria.getSpeedRequirement() != StorageCriteria::NO_REQUIREMENT)) {
-
-                switch(criteria.getSpeedRequirement()) {
-                case StorageCriteria::SPEED_LOW:
-                    if (IS_YES(isFullyDistributed())) {
-                        score -= 1.0;
-                    }
-                    break;
-                case StorageCriteria::SPEED_HIGH:
-                    if (!IS_YES(isFullyDistributed())) {
-                        score -= 1.0;
-                    }
-                    break;
-                default:
-                    score -= 1.0;
-                    break;
-                }
-            }
-
-            if ((score > (STORAGE_CLASSIFIER_MIN_MATCH_SCORE-0.5))
-                && (criteria.getFsScalabilityRequirement() != StorageCriteria::NO_REQUIREMENT)) {
-
-                switch(criteria.getFsScalabilityRequirement()) {
-                case StorageCriteria::FS_SCAL_SINGLE:
-                    if (mpInfo.determineFSType(myEntry.type) == fs_lustre) {
-                        //
-                        // Assume that when fs_lustre, everyone has the same type
-                        //
-                        score -= 1.0;
-                    }
-                    break;
-                case StorageCriteria::FS_SCAL_MULTI:
-                    if (mpInfo.determineFSType(myEntry.type) != fs_lustre) {
-                        //
-                        // Assume that when fs_lustre, everyone has the same type
-                        //
-                        score -= 1.0;
-                    }
-                    break;
-                default:
-                    score -= 1.0;
-                    break;
-                }
-            }
-        }
-    }
-
-has_error:
-    return score;
+    return rc; 
 }
-#endif
 

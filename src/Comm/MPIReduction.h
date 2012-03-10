@@ -25,7 +25,7 @@ extern "C" {
 #include "DistDesc.h"
 
 
-namespace FastGlobalFileStat {
+namespace FastGlobalFileStatus {
 
   namespace CommLayer {
 
@@ -92,6 +92,6 @@ namespace FastGlobalFileStat {
     };
 
   } // CommLayer namespace
-} // FastGlobalFileStat namespace
+} // FastGlobalFileStatus namespace
 
 #endif // MPI_REDUCTION_H

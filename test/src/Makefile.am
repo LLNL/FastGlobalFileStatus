@@ -21,13 +21,21 @@ INCLUDES                       = -I$(top_srcdir) \
 testdir                        = ${pkgdatadir}/tests
 test_PROGRAMS                  = sync_stat_dso_mpi \
                                  async_stat_dso_mpi \
+                                 st_classifier_constmem_per_proc \
+                                 st_classifier_big_on_oneproc \
+                                 st_mountpoint_classifier \
                                  async_stat_dso_mrnet \
                                  gen_hostlist \
-                                 mrnet_node_req
+                                 mrnet_node_req \
+				 my_topo_gen
 
-test_SCRIPTS                   = mrnet_topo_gen.sh 
+test_SCRIPTS                   = mrnet_topo_gen.sh \
+                                 run.fgfs_tester.sh.in \
+                                 run.fgfs_tester_mpi.sh.in \
+                                 MRNetScalingSetup.sh \
+                                 MPIScalingSetup.sh
 
-CLEANFILES                     = $(test_SCRIPTS)
+CLEANFILES                     = mrnet_topo_gen.sh
 EXTRA_DIST                     = mrnet_topo_gen.sh.in \
                                  run.fgfs_tester.sh.in \
                                  run.fgfs_tester_mpi.sh.in \
@@ -50,9 +58,36 @@ sync_stat_dso_mpi_LDADD        = -lelf -lssl @LIBMPA@ -lfgfs_mpi
 #
 async_stat_dso_mpi_SOURCES     = async_stat_dso_mpi.C \
                                  FgfsTestGetDsoList.C
-async_stat_dso_mpi_CXXFLAGS    = $(MPI_CFLAGS) $(AM_CXXFLAGS) 
+async_stat_dso_mpi_CXXFLAGS    = $(MPI_CFLAGS) $(AM_CXXFLAGS)
 async_stat_dso_mpi_LDFLAGS     = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLAGS)
 async_stat_dso_mpi_LDADD       = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+
+
+#
+#  ST_CLASSIFIER_CONSTMEM_PER_PROC  rules
+#
+st_classifier_constmem_per_proc_SOURCES     = st_classifier_constmem_per_proc.C
+st_classifier_constmem_per_proc_CXXFLAGS    = $(MPI_CFLAGS) $(AM_CXXFLAGS)
+st_classifier_constmem_per_proc_LDFLAGS     = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLAGS)
+st_classifier_constmem_per_proc_LDADD       = @LIBMPA@ -lfgfs_mpi
+
+
+#
+#  ST_CLASSIFIER_BIG_ON_ONEPROC rules
+#
+st_classifier_big_on_oneproc_SOURCES  = st_classifier_big_on_oneproc.C
+st_classifier_big_on_oneproc_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
+st_classifier_big_on_oneproc_LDFLAGS  = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLAGS)
+st_classifier_big_on_oneproc_LDADD    = @LIBMPA@ -lfgfs_mpi
+
+
+#
+#  ST_MOUNTPOINT_CLASSIFIER rules
+#
+st_mountpoint_classifier_SOURCES  = st_mountpoint_classifier.C
+st_mountpoint_classifier_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
+st_mountpoint_classifier_LDFLAGS  = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLAGS)
+st_mountpoint_classifier_LDADD    = @LIBMPA@ -lfgfs_mpi
 
 
 #
@@ -67,8 +102,16 @@ gen_hostlist_LDFLAGS           = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLA
 #  mrnet_node_req rules
 #
 mrnet_node_req_SOURCES         = mrnet_node_req.C
-mrnet_node_req_CXXFLAGS        = $(MPI_CFLAGS) $(AM_CXXFLAGS) 
-mrnet_node_req_LDFLAGS         = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLAGS)
+mrnet_node_req_CXXFLAGS        = $(AM_CXXFLAGS) 
+mrnet_node_req_LDFLAGS         = -L$(top_srcdir)/src 
+
+
+#
+#  myTopoGen rules
+#
+my_topo_gen_SOURCES            = my_topo_gen.C
+my_topo_gen_CXXFLAGS           = $(AM_CXXFLAGS) 
+my_topo_gen_LDFLAGS            = -L$(top_srcdir)/src 
 
 
 #

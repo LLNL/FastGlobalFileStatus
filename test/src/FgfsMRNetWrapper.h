@@ -33,15 +33,15 @@ extern "C" {
 #include "mrnet/MRNet.h"
 #include "Comm/MRNetCommFabric.h"
 
-const int MRNetHelloTag = FastGlobalFileStat::CommLayer::MMT_place_holder;
+const int MRNetHelloTag = FastGlobalFileStatus::CommLayer::MMT_place_holder;
 
 extern int MRNet_Init(
-       FastGlobalFileStat::CommLayer::MRNetCompKind mrnetComponent,
+       FastGlobalFileStatus::CommLayer::MRNetCompKind mrnetComponent,
        int *argcPtr, char ***argvPtr, char *daemon, char *topo,
        MRN::Network **netObjPtr, MRN::Stream **channelObjPtr);
 
 extern int MRNet_Finalize(
-       FastGlobalFileStat::CommLayer::MRNetCompKind mrnetComponent,
+       FastGlobalFileStatus::CommLayer::MRNetCompKind mrnetComponent,
        MRN::Network *netObjPtr, MRN::Stream *channelObjPtr);
 
 #endif //FGFS_MRNET_WRAPPER_H

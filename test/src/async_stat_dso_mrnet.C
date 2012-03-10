@@ -14,6 +14,7 @@ extern "C" {
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdint.h>
+# include <limits.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <unistd.h>
@@ -36,9 +37,9 @@ extern "C" {
 
 
 using namespace MRN;
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::MountPointAttribute;
-using namespace FastGlobalFileStat::CommLayer;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::MountPointAttribute;
+using namespace FastGlobalFileStatus::CommLayer;
 
 
 enum TestType {
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
     std::string execPath = argv[2];
     char *pathBuf = NULL;
     char *traverse = NULL;
-    int packedSize = 0;
+    unsigned int packedSize = 0;
     std::vector<std::string> dRealpathLibs;
     std::vector<std::string>::const_iterator it;
 
@@ -149,6 +150,7 @@ int main(int argc, char *argv[])
     else {
         PacketPtr recvP;
         int tag;
+
         channelObj->recv(&tag, recvP);
         if (recvP->unpack("%auc", &pathBuf, &packedSize) == -1) {
             MPA_sayMessage("TEST",
@@ -186,13 +188,13 @@ int main(int argc, char *argv[])
     uint32_t startTime;
     if (mrnetComponent == mck_frontEnd) startTime = stampstart();
 
-    rc = AsyncGlobalFileStat::initialize(cfab);
+    rc = AsyncGlobalFileStatus::initialize(cfab);
 
     if (!rc) {
         if (mrnetComponent == mck_frontEnd) {
             MPA_sayMessage("TEST",
                        true,
-                       "AsyncGlobalFileStat::initialize returned false");
+                       "AsyncGlobalFileStatus::initialize returned false");
         }
 
         MRNet_Finalize(mrnetComponent, netObj, channelObj);
@@ -201,7 +203,7 @@ int main(int argc, char *argv[])
 
     int nHit = 0;
     for (it = dRealpathLibs.begin(); it != dRealpathLibs.end(); it++) {
-        AsyncGlobalFileStat myStat((*it).c_str());
+        AsyncGlobalFileStatus myStat((*it).c_str());
         if (mrnetComponent == mck_frontEnd) {
             if (ChkVerbose(1)) {
                 MPA_sayMessage("TEST", false, "%s", (*it).c_str());

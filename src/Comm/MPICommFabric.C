@@ -11,13 +11,14 @@
  */
 
 #include <mpi.h>
+#include <cstdlib>
 #include "MPIReduction.h"
 #include "MPICommFabric.h"
 #include "MountPointAttr.h"
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::CommLayer;
-using namespace FastGlobalFileStat::MountPointAttribute;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::CommLayer;
+using namespace FastGlobalFileStatus::MountPointAttribute;
 
 
 ///////////////////////////////////////////////////////////////////
@@ -29,7 +30,7 @@ using namespace FastGlobalFileStat::MountPointAttribute;
 
 ///////////////////////////////////////////////////////////////////
 //
-//  PUBLIC INTERFACE:   namespace FastGlobalFileStat::CommLayer
+//  PUBLIC INTERFACE:   namespace FastGlobalFileStatus::CommLayer
 //
 //
 
@@ -301,7 +302,7 @@ MPICommFabric::receive(int sender, FgfsParDesc &pd)
 
 ///////////////////////////////////////////////////////////////////
 //
-//  PRIVATE INTERFACE:   namespace FastGlobalFileStat::CommLayer
+//  PRIVATE INTERFACE:   namespace FastGlobalFileStatus::CommLayer
 //
 //
 
@@ -352,6 +353,10 @@ MPICommFabric::getMPIOp(ReduceOperator op) const
     switch(op) {
     case REDUCE_MAX:
         myOp = MPI_MAX;
+        break;
+
+    case REDUCE_MIN:
+        myOp = MPI_MIN;
         break;
 
     case REDUCE_SUM:

@@ -20,9 +20,9 @@ extern "C" {
 #include "MountPointAttr.h"
 
 using namespace MRN;
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::MountPointAttribute;
-using namespace FastGlobalFileStat::CommLayer;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::MountPointAttribute;
+using namespace FastGlobalFileStatus::CommLayer;
 
 //
 // Home location for those extern variables
@@ -40,7 +40,7 @@ extern "C" void MPIR_Breakpoint()
 
 
 static void
-fillProctable(const char *daemonpath, int count,
+fillProctable(const char *daemonpath, unsigned int count,
               unsigned char *debugBuf, unsigned int debugBufLen)
 {
     unsigned char *trav = debugBuf;
@@ -104,7 +104,7 @@ setupDebugFE(const char *daemonpath, Stream *strm)
 
     int rc = -1;
     int tag;
-    int count;
+    unsigned int count;
     PacketPtr recvP;
     unsigned char *debugBuf;
     unsigned int debugBufLen;
@@ -214,7 +214,6 @@ setupDebugBE(Stream *strm, const char *daemonpath)
     memcpy((void *)t, (void *)daemonpath, daemonLen);
     count = 1;
     totalLen = (sizeof(myPid) + hnLen + daemonLen);
-
 
     if (strm->send(MMT_debug_mpir,
                    "%d %auc",
@@ -370,7 +369,8 @@ int MRNet_Finalize(MRNetCompKind mrnetComponent,
                            "Stream recv returns an error.");
             goto ret_loc;
         }
-        int tmp, tmpsize;
+        int tmp;
+        unsigned int tmpsize;
         recvP->unpack("%auc", (unsigned char *) &tmp, &tmpsize);
 
         if (netObjPtr) {

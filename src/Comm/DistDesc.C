@@ -11,9 +11,10 @@
  */
 
 #include "DistDesc.h"
+#include <string.h>
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::CommLayer;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::CommLayer;
 
 
 ///////////////////////////////////////////////////////////////////
@@ -25,7 +26,7 @@ using namespace FastGlobalFileStat::CommLayer;
 
 ///////////////////////////////////////////////////////////////////
 //
-//  PUBLIC INTERFACE:   namespace FastGlobalFileStat::CommLayer
+//  PUBLIC INTERFACE:   namespace FastGlobalFileStatus::CommLayer
 //
 //
 
@@ -167,7 +168,7 @@ FgfsParDesc::isRep() const
         }
     }
 
-    return ans_error;
+    return answer;
 }
 
 
@@ -298,14 +299,14 @@ FgfsParDesc::getRankInGroup() const
 void
 FgfsParDesc::setGroupSize(FgfsCount_t sz)
 {
-    mRankInGroup = sz;
+    mGroupSize = sz;
 }
 
 
 FgfsCount_t
 FgfsParDesc::getGroupSize() const
 {
-    return mRankInGroup;
+    return mGroupSize;
 }
 
 
@@ -454,12 +455,15 @@ FgfsParDesc::setGroupInfo()
     if (iter != groupingMap.end()) {
         setRepInGroup(iter->second.getFirstRank());
         setGroupId(iter->second.getFirstRank());
+#if 0
         if (getRepInGroup() == getRank()) {
             setRankInGroup(0);
         }
         else {
             setRankInGroup(getRank());
         }
+#endif
+        setRankInGroup(getRank());
         setGroupSize(iter->second.getCount());
     }
     else {

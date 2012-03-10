@@ -15,9 +15,9 @@
 #include "MountPointAttr.h"
 #include "MRNetCommFabric.h"
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::CommLayer;
-using namespace FastGlobalFileStat::MountPointAttribute;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::CommLayer;
+using namespace FastGlobalFileStatus::MountPointAttribute;
 using namespace MRN;
 
 extern "C" {

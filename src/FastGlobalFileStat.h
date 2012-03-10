@@ -33,7 +33,7 @@ extern "C" {
 #include "Comm/CommFabric.h"
 
 
-namespace FastGlobalFileStat {
+namespace FastGlobalFileStatus {
 
     /**
      *   Enumerates algorithm types. These represent internal
@@ -51,72 +51,19 @@ namespace FastGlobalFileStat {
 
 
     /**
-     *   Base class that serves as a high-level Global File Stat 
-     *   interface in a underlying communication fabric independent manner.
+     *   Defines per-file API through an abstract class. Any class that
+     *   derives this API must implement the pure virtual methods.
      */
-    class GlobalFileStatBase {
+    class GlobalFileStatusAPI {
     public:
 
         /**
-         *   GlobalFileStatBase::FGFS_NPROC_TO_SATURATE (64)
-         *   Defines the process count that serves as a
-         *   threshold above which to saturate a shared file server.
-         */
-        static const int FGFS_NPROC_TO_SATURATE = 64;
-
-        /**
-         *   GlobalFileStatBase::FGFS_UNIQUE_RANGE_MAX (3)
-         *   For small scale cases, even wellDistributed cases can be unique
-         *   so upper layer should do an additional check of
-         *   if getCardinalityEst is leq FGFS_UNIQUE_RANGE_MAX
-         */
-        static const int FGFS_UNIQUE_RANGE_MAX = 3;
-
-        /**
-         *   GlobalFileStatBase Ctor
+         *   GlobalFileStatusAPI Ctor
          *
          *   @param[in] pth an absolute path with no links to a file
          *   @return none
          */
-        GlobalFileStatBase(const char *pth);
-
-        /**
-         *   GlobalFileStatBase Ctor
-         *
-         *   @param[in] pth an absolute path with no links to a file
-         *   @param[in] threshold a process count to staturate the
-         *                         file server; when you want to overwrite
-         *                         the default threshold.
-         *   @return none
-         */
-        GlobalFileStatBase(const char *pth, const int threshold);
-
-        virtual ~GlobalFileStatBase();
-
-        /**
-         *   Return the MountPointInfo object, class static object holding
-         *   all the information about the per-node mount points
-         *
-         *   @return an MountPointInfo object
-         */
-        static const MountPointAttribute::MountPointInfo & getMpInfo();
-
-        /**
-         *   Return the CommFabric object, class static object holding
-         *   communcation fabric layer
-         *
-         *   @return a CommFabric object
-         */
-        static const CommLayer::CommFabric *getCommFabric();
-
-        /**
-         *   Initialize including communication fabric bootstrapping
-         *
-         *   @param[in] c CommFabric object
-         *
-         *   @return a bool value
-         */
-        static bool initialize(CommLayer::CommFabric *c);
+        GlobalFileStatusAPI(const char *pth);
 
         /**
          *   Is the path served in the fully distributed fashion?
@@ -170,6 +117,149 @@ namespace FastGlobalFileStat {
         CommLayer::FgfsParDesc & getParallelInfo();
 
         /**
+         *   Return grouping information
+         *   @return a FgfsParDesc object as const
+         */
+        const CommLayer::FgfsParDesc & getParallelInfo() const;
+
+        /**
+         *   Return Uri of FileUriInfo type
+         *   @return an Uri
+         */
+        MountPointAttribute::FileUriInfo & getUriInfo();
+
+        /**
+         *   Return Uri of FileUriInfo type
+         *   @return a FileUriInfo object as const
+         */
+        const MountPointAttribute::FileUriInfo & getUriInfo() const;
+
+        /**
+         *   Return MyMntEnt
+         *   @return a MyMntEnt object
+         */
+        MountPointAttribute::MyMntEnt & getMyEntry();
+
+        /**
+         *   Return MyMntEnt
+         *   @return a MyMntEnt object of const
+         */
+        const MountPointAttribute::MyMntEnt & getMyEntry() const;
+
+        /**
+         *   Check if the path globally node-local
+         *   @return yes or no of bool type
+         */
+        bool isNodeLocal() const;
+
+        /**
+         *   Check if the path globally node-local
+         *   @return yes or no of bool type
+         */
+        bool setNodeLocal(bool b);
+
+        /**
+         *   Return cardinality estimate
+         *   @return an integer cardinality
+         */
+        int getCardinalityEst() const;
+
+        /**
+         *   Set CardinalityEst
+         *   @param[in] new  CardinalityEst of integer type
+         *   @return the old CardinalityEst of integer type
+         */
+        int setCardinalityEst(const int d);
+
+
+    private:
+
+        /**
+         *   target path
+         */
+        std::string mPath;
+
+        /**
+         *   parallel information such as your repr task and ranks
+         */
+        CommLayer::FgfsParDesc mParallelInfo;
+
+        /**
+         *   globally unique file ID for path on this node
+         */
+        MountPointAttribute::FileUriInfo mUriInfo;
+
+        /**
+         *   Local MyMntEnt entry for m_path
+         */
+        MountPointAttribute::MyMntEnt mEntry;
+
+        /**
+         *   is m_path local
+         */
+        bool mNodeLocal;
+
+        /**
+         *   max likelihood of the set cardinality
+         */
+        int mCardinalityEst;
+    };
+
+
+    /**
+     *   Base class that serves as a high-level Global File Stat 
+     *   interface in a underlying communication fabric independent manner.
+     */
+    class GlobalFileStatusBase {
+    public:
+
+        /**
+         *   GlobalFileStatBase::FGFS_NPROC_TO_SATURATE (64)
+         *   Defines the process count that serves as a
+         *   threshold above which to saturate a shared file server.
+         */
+        static const int FGFS_NPROC_TO_SATURATE = 64;
+
+        /**
+         *   GlobalFileStatBase::FGFS_UNIQUE_RANGE_MAX (3)
+         *   For small scale cases, even wellDistributed cases can be unique
+         *   so upper layer should do an additional check of
+         *   if getCardinalityEst is leq FGFS_UNIQUE_RANGE_MAX
+         */
+        static const int FGFS_UNIQUE_RANGE_MAX = 3;
+
+        GlobalFileStatusBase();
+
+        GlobalFileStatusBase(int threshold);
+
+        virtual ~GlobalFileStatusBase();
+
+        /**
+         *   Return the MountPointInfo object, class static object holding
+         *   all the information about the per-node mount points
+         *
+         *   @return an MountPointInfo object
+         */
+        static const MountPointAttribute::MountPointInfo & getMpInfo();
+
+        /**
+         *   Return the CommFabric object, class static object holding
+         *   communcation fabric layer
+         *
+         *   @return a CommFabric object
+         */
+        static const CommLayer::CommFabric *getCommFabric();
+
+        /**
+         *   Initialize including communication fabric bootstrapping
+         *
+         *   @param[in] c CommFabric object
+         *
+         *   @return a bool value
+         */
+        static bool initialize(CommLayer::CommFabric *c);
+
+        /**
          *   Check if there has been an error encountered
          *   @return true if an error
          */
@@ -177,13 +267,6 @@ namespace FastGlobalFileStat {
 
 
     protected:
-
-
-        /**
-         *   Return MyMntEnt
-         *   @return a MyMntEnt object
-         */
-        const MountPointAttribute::MyMntEnt &getMyEntry() const;
 
         /**
          *   Return ThresholdToSaturate
@@ -212,74 +295,62 @@ namespace FastGlobalFileStat {
         int setHiLoCutoff(const int th);
 
         /**
-         *   Check if the path globally node-local
-         *   @return yes or no of bool type
-         */
-        bool isNodeLocal() const;
-
-        /**
-         *   Return cardinality estimate
-         *   @return an integer cardinality
-         */
-        int getCardinalityEst() const;
-
-        /**
-         *   Set CardinalityEst
-         *   @param[in] new  CardinalityEst of integer type
-         *   @return the old CardinalityEst of integer type
-         */
-        int setCardinalityEst(const int d);
-
-        /**
          *   Performs necessary communication to determine global
          *   properties including a number of different equivalent
          *   groups
+         *   @param[in|out] a GlobalFileStatAPI object
          *   @return success or failure of bool type
          */
-        bool computeParallelInfo();
+        bool computeParallelInfo(GlobalFileStatusAPI *gfsObj,
+                                 CommAlgorithms algo=bloomfilter);
 
         /**
          *   Performs cardinality estimate: how many different equivalent 
          *   groups are there? The client can get this estimate with
          *   the getCardinalityEst method
+         *   @param[in|out] a GlobalFileStatAPI object
+         *   @param[in] an algorithm type of CommAlgorithms
          *   @return success or failure of bool type
          */
-        bool computeCardinalityEst(CommAlgorithms algo=bloomfilter);
+        bool computeCardinalityEst(GlobalFileStatusAPI *gfsObj,
+                                   CommAlgorithms algo=bloomfilter);
 
         /**
          *   Performs cardinality estimate based on the bloomfilter
          *   algorithm.
+         *   @param[in|out] a GlobalFileStatAPI object
          *   @return success or failure of bool type
          */
-        bool bloomfilterCardinalityEst();
+        bool bloomfilterCardinalityEst(GlobalFileStatusAPI *gfsObj);
 
         /**
          *   Performs cardinality estimate based on the sampling
-         *   algorithm
+         *   algorithm: NotImplemented
+         *   @param[in|out] a GlobalFileStatAPI object
          *   @return success or failure of bool type
          */
-        bool samplingCardinalityEst();
+        bool samplingCardinalityEst(GlobalFileStatusAPI *gfsObj);
 
         /**
          *   Performs cardinality estimate based on the generalized
-         *   comm-split
+         *   comm-split: NotImplemented
+         *   @param[in|out] a GlobalFileStatAPI object
          *   @return success or failure of bool type
          */
-        bool hier_commsplitCardinality();
+        bool hier_commsplitCardinality(GlobalFileStatusAPI *gfsObj);
 
         /**
          *   Performs cardinality check (accurate) based on the
-         *   actual list reduction.
+         *   actual list reduction: NotImplemented
+         *   @param[in|out] a GlobalFileStatAPI object
          *   @return success or failure of bool type
          */
-        bool plain_parallelInfo();
+        bool plain_parallelInfo(GlobalFileStatusAPI *gfsObj);
 
 
     private:
 
-        GlobalFileStatBase();
-
-        GlobalFileStatBase(const GlobalFileStatBase &s);
+        GlobalFileStatusBase(const GlobalFileStatusBase &s);
 
         uint32_t getPopCount(uint32_t *filter, uint32_t s);
 
@@ -302,37 +373,6 @@ namespace FastGlobalFileStat {
          *   cutoff in terms of p/maxNPPerGroup
          */
         int mHiLoCutoff;
-
-        /**
-         *   target path
-         */
-        std::string mPath;
-
-        /**
-         *   parallel information such as your repr task and ranks
-         */
-        CommLayer::FgfsParDesc mParallelInfo;
-
-        /**
-         *   globally unique file ID for path on this node
-         */
-        MountPointAttribute::FileUriInfo mUri;
-
-        /**
-         *   Local MyMntEnt entry for m_path
-         */
-        MountPointAttribute::MyMntEnt mEntry;
-
-        /**
-         *   is m_path local
-         */
-        bool mNodeLocal;
-
-        /**
-         *   max likelihood of the set cardinality
-         */
-        int mCardinalityEst;
-
 
         /**
          *   communication fabric (does this have to be static?)

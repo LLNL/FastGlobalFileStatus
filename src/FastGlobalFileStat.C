@@ -19,6 +19,7 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <fcntl.h>
 #include <sys/vfs.h>
 #include "bloom.h"
@@ -28,18 +29,19 @@ extern "C" {
 #include <sstream>
 #include <stdexcept>
 #include "FastGlobalFileStat.h"
+#include "config.h"
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::MountPointAttribute;
-using namespace FastGlobalFileStat::CommLayer;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::MountPointAttribute;
+using namespace FastGlobalFileStatus::CommLayer;
 
 ///////////////////////////////////////////////////////////////////
 //
 //  static data
 //
 //
-CommFabric *GlobalFileStatBase::mCommFabric = NULL;
-MountPointInfo GlobalFileStatBase::mpInfo(true);
+CommFabric *GlobalFileStatusBase::mCommFabric = NULL;
+MountPointInfo GlobalFileStatusBase::mpInfo(true);
 
 
 ///////////////////////////////////////////////////////////////////
@@ -48,35 +50,125 @@ MountPointInfo GlobalFileStatBase::mpInfo(true);
 //
 //
 
+
 ///////////////////////////////////////////////////////////////////
 //
-//  class GlobalFileStat
+//  class GlobalFileStatusAPI
 //
 //
 
-GlobalFileStatBase::GlobalFileStatBase(const char *pth)
-    : mHasErr(false),
-      mAlgorithm(algo_unknown),
-      mThresholdToSaturate(FGFS_NPROC_TO_SATURATE),
-      mHiLoCutoff(FGFS_NOT_FILLED),
-      mCardinalityEst(FGFS_NOT_FILLED),
+
+GlobalFileStatusAPI::GlobalFileStatusAPI(const char *pth)
+    : mCardinalityEst(FGFS_NOT_FILLED),
       mNodeLocal(false)
 {
     mPath = pth;
+}
+
+
+const char *
+GlobalFileStatusAPI::getPath() const
+{
+    return mPath.c_str();
+}
+
+
+CommLayer::FgfsParDesc &
+GlobalFileStatusAPI::getParallelInfo()
+{
+    return mParallelInfo;
+}
+
+
+const CommLayer::FgfsParDesc &
+GlobalFileStatusAPI::getParallelInfo() const
+{
+    return mParallelInfo;
+}
+
+
+MountPointAttribute::FileUriInfo &
+GlobalFileStatusAPI::getUriInfo()
+{
+    return mUriInfo;
+}
+
+
+const MountPointAttribute::FileUriInfo &
+GlobalFileStatusAPI::getUriInfo() const
+{
+    return mUriInfo;
+}
+
+
+MyMntEnt &
+GlobalFileStatusAPI::getMyEntry()
+{
+    return mEntry;
+}
+
+
+const MyMntEnt &
+GlobalFileStatusAPI::getMyEntry() const
+{
+    return mEntry;
+}
+
+
+bool
+GlobalFileStatusAPI::isNodeLocal() const
+{
+    return mNodeLocal;
+}
+
+
+bool
+GlobalFileStatusAPI::setNodeLocal(bool b)
+{
+    mNodeLocal = b;
+}
+
+
+int
+GlobalFileStatusAPI::getCardinalityEst() const
+{
+    return mCardinalityEst;
+}
+
+
+int
+GlobalFileStatusAPI::setCardinalityEst(const int d)
+{
+    int rsd = mCardinalityEst;
+    mCardinalityEst = d;
+    return rsd;
+}
+
+
+///////////////////////////////////////////////////////////////////
+//
+//  class GlobalFileStatusBase
+//
+//
+
+
+GlobalFileStatusBase::GlobalFileStatusBase()
+    : mHasErr(false),
+      mAlgorithm(algo_unknown),
+      mThresholdToSaturate(FGFS_NPROC_TO_SATURATE),
+      mHiLoCutoff(FGFS_NOT_FILLED)
+{
     if (!mCommFabric) {
         mHasErr = true;
     }
 }
 
 
-GlobalFileStatBase::GlobalFileStatBase(const char *pth, const int value)
+GlobalFileStatusBase::GlobalFileStatusBase(const int value)
     : mHasErr(false),
       mAlgorithm(algo_unknown),
-      mHiLoCutoff(FGFS_NOT_FILLED),
-      mCardinalityEst(FGFS_NOT_FILLED),
-      mNodeLocal(false)
+      mHiLoCutoff(FGFS_NOT_FILLED)
 {
-    mPath = pth;
     mThresholdToSaturate = value;
     if (!mCommFabric) {
         mHasErr = true;
@@ -84,28 +176,28 @@ GlobalFileStatBase::GlobalFileStatBase(const char *pth, const int value)
 }
 
 
-GlobalFileStatBase::~GlobalFileStatBase()
+GlobalFileStatusBase::~GlobalFileStatusBase()
 {
     // mCommFabric must not be deleted!
 }
 
 
 const MountPointInfo &
-GlobalFileStatBase::getMpInfo()
+GlobalFileStatusBase::getMpInfo()
 {
     return mpInfo;
 }
 
 
 const CommFabric *
-GlobalFileStatBase::getCommFabric() 
+GlobalFileStatusBase::getCommFabric()
 {
     return mCommFabric;
 }
 
 
 bool
-GlobalFileStatBase::initialize(CommFabric *c)
+GlobalFileStatusBase::initialize(CommFabric *c)
 {
     if (!c) {
         return false;
@@ -117,22 +209,8 @@ GlobalFileStatBase::initialize(CommFabric *c)
 }
 
 
-const char *
-GlobalFileStatBase::getPath() const
-{
-    return mPath.c_str();
-}
-
-
-FgfsParDesc &
-GlobalFileStatBase::getParallelInfo() 
-{
-    return mParallelInfo;
-}
-
-
 bool
-GlobalFileStatBase::hasError()
+GlobalFileStatusBase::hasError()
 {
     return mHasErr;
 }
@@ -144,22 +222,15 @@ GlobalFileStatBase::hasError()
 //
 //
 
-const MyMntEnt &
-GlobalFileStatBase::getMyEntry() const
-{
-    return mEntry;
-}
-
-
 int
-GlobalFileStatBase::getThresholdToSaturate() const
+GlobalFileStatusBase::getThresholdToSaturate() const
 {
     return mThresholdToSaturate;
 }
 
 
 int
-GlobalFileStatBase::setThresholdToSaturate(const int sg)
+GlobalFileStatusBase::setThresholdToSaturate(const int sg)
 {
     int rsg = mThresholdToSaturate;
     mThresholdToSaturate = sg;
@@ -168,14 +239,14 @@ GlobalFileStatBase::setThresholdToSaturate(const int sg)
 
 
 int
-GlobalFileStatBase::getHiLoCutoff() const
+GlobalFileStatusBase::getHiLoCutoff() const
 {
     return mHiLoCutoff;
 }
 
 
 int
-GlobalFileStatBase::setHiLoCutoff(const int th)
+GlobalFileStatusBase::setHiLoCutoff(const int th)
 {
     int cval = mHiLoCutoff;
     mHiLoCutoff = th;
@@ -183,31 +254,8 @@ GlobalFileStatBase::setHiLoCutoff(const int th)
 }
 
 
-bool
-GlobalFileStatBase::isNodeLocal() const
-{
-    return mNodeLocal;
-}
-
-
-int
-GlobalFileStatBase::getCardinalityEst() const
-{
-    return mCardinalityEst;
-}
-
-
-int
-GlobalFileStatBase::setCardinalityEst(const int d)
-{
-    int rsd = mCardinalityEst;
-    mCardinalityEst = d;
-    return rsd;
-}
-
-
 uint32_t
-GlobalFileStatBase::getPopCount(uint32_t *filter, uint32_t s)
+GlobalFileStatusBase::getPopCount(uint32_t *filter, uint32_t s)
 {
     //
     // This algorithm is picked up from Wikipeda regarding
@@ -233,30 +281,31 @@ GlobalFileStatBase::getPopCount(uint32_t *filter, uint32_t s)
 
 
 bool
-GlobalFileStatBase::computeCardinalityEst(CommAlgorithms algo/*=bloomfilter*/)
+GlobalFileStatusBase::computeCardinalityEst(GlobalFileStatusAPI *gfsObj,
+                                            CommAlgorithms algo/*=bloomfilter*/)
 {
     mAlgorithm = algo;
     bool rc = false;
 
     switch (algo) {
     case bloomfilter:
-        rc = bloomfilterCardinalityEst();
+        rc = bloomfilterCardinalityEst(gfsObj);
         break;
 
     case sampling:
-        rc = samplingCardinalityEst();
+        rc = samplingCardinalityEst(gfsObj);
         break;
 
     case hier_commsplit:
-        rc = hier_commsplitCardinality();
+        rc = hier_commsplitCardinality(gfsObj);
         break;
 
     case bloomfilter_hier_commsplit:
-        rc = bloomfilterCardinalityEst();
+        rc = bloomfilterCardinalityEst(gfsObj);
         break;
 
     case sampling_hier_commsplit:
-        rc = samplingCardinalityEst();
+        rc = samplingCardinalityEst(gfsObj);
         break;
 
     default:
@@ -268,29 +317,37 @@ GlobalFileStatBase::computeCardinalityEst(CommAlgorithms algo/*=bloomfilter*/)
 
 
 bool
-GlobalFileStatBase::computeParallelInfo()
+GlobalFileStatusBase::computeParallelInfo(GlobalFileStatusAPI *gfsObj,
+                                          CommAlgorithms algo/*=bloomfilter*/)
+
 {
     bool rc = false;
+    CommAlgorithms algoToUse;
+    algoToUse = mAlgorithm;
 
-    switch (mAlgorithm) {
+    if (algoToUse == algo_unknown) {
+        algoToUse = algo;
+    }
+
+    switch (algoToUse) {
     case bloomfilter:
-        rc = plain_parallelInfo();
+        rc = plain_parallelInfo(gfsObj);
         break;
 
     case sampling:
-        rc = samplingCardinalityEst();
+        rc = samplingCardinalityEst(gfsObj);
         break;
 
     case hier_commsplit:
-        rc = hier_commsplitCardinality();
+        rc = hier_commsplitCardinality(gfsObj);
         break;
 
     case bloomfilter_hier_commsplit:
-        rc = bloomfilterCardinalityEst();
+        rc = bloomfilterCardinalityEst(gfsObj);
         break;
 
     case sampling_hier_commsplit:
-        rc = samplingCardinalityEst();
+        rc = samplingCardinalityEst(gfsObj);
         break;
 
     default:
@@ -307,20 +364,22 @@ GlobalFileStatBase::computeParallelInfo()
 //  Private Interface
 //
 //
+
+
 bool
-GlobalFileStatBase::bloomfilterCardinalityEst()
+GlobalFileStatusBase::bloomfilterCardinalityEst(GlobalFileStatusAPI *gfsObj)
 {
     int isRemote  = 0;
     int anyRemote = 0;
-    int P = (int) mParallelInfo.getSize();
+    int P = (int) (gfsObj->getParallelInfo().getSize());
     FGFSInfoAnswer answer = ans_error;
 
-    answer = mpInfo.isRemoteFileSystem(getPath(), mEntry);
+    answer = mpInfo.isRemoteFileSystem(gfsObj->getPath(), gfsObj->getMyEntry());
 
     isRemote = IS_YES(answer)? 1 : 0;
 
     if (!(mCommFabric->allReduce(true,
-                                 mParallelInfo,
+                                 gfsObj->getParallelInfo(),
                                  (void *) &isRemote,
                                  (void *) &anyRemote,
                                  1,
@@ -335,10 +394,15 @@ GlobalFileStatBase::bloomfilterCardinalityEst()
         goto has_error;
     }
 
+    //
+    // divide the process count by the saturation threshold
+    // If mHiLoCutoff = 0, not enough process count to saturate 
+    // any file system.
+    //
+    //
     mHiLoCutoff = P/getThresholdToSaturate();
 
-
-    if (mpInfo.getFileUriInfo(getPath(), mUri)) {
+    if (mpInfo.getFileUriInfo(gfsObj->getPath(), gfsObj->getUriInfo())) {
         if (ChkVerbose(1)) {
             MPA_sayMessage(
                 "GlobalFileStatBase",
@@ -348,15 +412,13 @@ GlobalFileStatBase::bloomfilterCardinalityEst()
         goto has_error;
     }
 
-    //printf("anyRemote: %d\n", anyRemote);
-
     if (!anyRemote || mHiLoCutoff == 0) {
         //
         // all local, none shared
         //
-        setCardinalityEst(P);
+        gfsObj->setCardinalityEst(P);
         if (!anyRemote) {
-            mNodeLocal = true;
+            gfsObj->setNodeLocal(true);
         }
     }
     else {
@@ -364,22 +426,60 @@ GlobalFileStatBase::bloomfilterCardinalityEst()
         //
         // Given numHashFuncs=2, n is the number of elements (n) in the set,
         // m is the number of bits in the bloom filter, P is the process count,
-        // t is the number of 1s in the filter, we first assume that n exceeding
-        // numProcesses/128 is already scalable. This means we want to minimize 
-        // the false posive rate when at worse case.
-        // Given that the density rate (t/m) of 0.5 provides optimized false 
-        // positive rate, and the formulata k=m/2 * ln(2) 
-        // m = P/64ln(2)
+        // t is the number of 1s in the filter.
+        //
+        // Now, we want to determine the m size such that it minimizes
+        // the false posive rate at worse case.
+        // Given that the density rate (t/m) of 0.5 provides optimimal false 
+        // positive rate, and the density is achieved when 
+        // k=m/n * ln(2), where k=2, m is the number of bits and n is the number
+        // of unique items. At worse case there can be P unique items
+        // (n=P): m = 2*P / ln(2)
+        //
+        // Optimizations: any locally attached storage will be detected w/o
+        // this triaging. Therefore, one can optimize it by calculating
+        // unique hostnames
+        //
+        // Since we are no longer concerned about local, the worse will
+        // be distributed case: So the stack can be configured w/
+        // the worse number of distributed servers. On LLNL Linux,
+        // there is one system nfs server per a scalable unit,
+        //  == 156 nodes with 16 cores on Zin, for example. 
+        //  Worst distributed case = 20. 
+        //
+        // 
+        //
         //
         //
         // Maximum likelihood of the set cardinality given t is
         //
         // S^-1(t) = ln(1-t/m)/(k*ln(1-1/m))
         //
-        //int m = (int) (((double)P/(double)getMaxShareGroupNumProc()) * log(2.0)
+	// int m = (int) (((double)P/(double)getThresholdToSaturate()) * log(2.0)
         //                  + 0.5);
-        int m = (int) (((double)P/(double)getThresholdToSaturate()) * log(2.0)
-                          + 0.5);
+        //
+        //
+        
+#ifdef MAX_DEGREE_DISTRIBUTION
+
+        // log(2.0): 0.693147 
+        int m = (int) ceil(double(2*MAX_DEGREE_DISTRIBUTION) / 0.693147);
+        if (ChkVerbose(1)) {
+            MPA_sayMessage("GlobalFileStatusBase",
+                false,
+                "max distribution degree given.");
+        }
+#else
+        // site-wide worse case not-known. This is absolutely the worst case
+        // assuming each process will access different server
+        // log(2.0): 0.693147 
+        int m = (int)ceil(((double)2*P) / 0.693147); 
+        if (ChkVerbose(1)) {
+            MPA_sayMessage("GlobalFileStatusBase",
+                false,
+                "bloom filter size is probably overestimated: sub-optimal performance.");
+        }
+#endif 
 
         // Granularity of m, multiples of 4-bytes
         int numUInt32t = (m+(sizeof(BloomFilterAlign_t)*CHAR_BIT-1))
@@ -395,7 +495,7 @@ GlobalFileStatBase::bloomfilterCardinalityEst()
         BLOOM *sendBloom = bloom_create(m, k, sax_hash, sdbm_hash);
         if (!sendBloom) {
             if (ChkVerbose(1)) {
-                MPA_sayMessage("GlobalFileStatBase",
+                MPA_sayMessage("GlobalFileStatusBase",
                     true,
                     "bloom_create failed bloomfilterCardinalityEst");
             }
@@ -404,9 +504,9 @@ GlobalFileStatBase::bloomfilterCardinalityEst()
         }
 
         std::string uri;
-        if (!mUri.getUri(uri)) {
+        if (!gfsObj->getUriInfo().getUri(uri)) {
             if (ChkVerbose(1)) {
-                MPA_sayMessage("GlobalFileStatBase",
+                MPA_sayMessage("GlobalFileStatusBase",
                                true,
                                "getUri failed");
             }
@@ -417,14 +517,14 @@ GlobalFileStatBase::bloomfilterCardinalityEst()
         bloom_add(sendBloom, uri.c_str());
 
         if (!(mCommFabric->allReduce(true,
-                                     mParallelInfo,
+                                     gfsObj->getParallelInfo(),
                                      (void *) sendBloom->a,
                                      (void *) recvbuf,
                                      (int) numBytes,
                                      REDUCE_CHAR_ARRAY,
                                      REDUCE_BOR)) ) {
             if (ChkVerbose(1)) {
-                MPA_sayMessage("GlobalFileStatBase",
+                MPA_sayMessage("GlobalFileStatusBase",
                                true,
                                "Error in globalAllReduceCharBOR");
             }
@@ -433,9 +533,9 @@ GlobalFileStatBase::bloomfilterCardinalityEst()
         }
 
         t = getPopCount((uint32_t *) recvbuf, numBytes/sizeof(uint32_t));
-        maxLikelihoodCardinality = (log(1.0 - (double)t/((double)m))) 
+        maxLikelihoodCardinality = (log(1.0 - (double)t/((double)m)))
                                     / ((double)k * log(1.0 - 1.0/((double)m)));
-        setCardinalityEst((int) (maxLikelihoodCardinality + 0.5));
+        gfsObj->setCardinalityEst((int) (maxLikelihoodCardinality + 0.5));
         bloom_destroy(sendBloom);
         free(recvbuf);
     }
@@ -448,35 +548,35 @@ has_error:
 
 
 bool
-GlobalFileStatBase::samplingCardinalityEst()
+GlobalFileStatusBase::samplingCardinalityEst(GlobalFileStatusAPI *gfsObj)
 {
     return false;
 }
 
 
 bool
-GlobalFileStatBase::hier_commsplitCardinality()
+GlobalFileStatusBase::hier_commsplitCardinality(GlobalFileStatusAPI *gfsObj)
 {
     return false;
 }
 
 
 bool
-GlobalFileStatBase::plain_parallelInfo()
+GlobalFileStatusBase::plain_parallelInfo(GlobalFileStatusAPI *gfsObj)
 {
     bool rc;
     std::string uri;
 
-    if (!mUri.getUri(uri)) {
+    if (!gfsObj->getUriInfo().getUri(uri)) {
         if (ChkVerbose(0)) {
-            MPA_sayMessage("GlobalFileStatBase",
+            MPA_sayMessage("GlobalFileStatusBase",
                            true,
                            "getUri failed");
         }
         rc = false;
     }
     else {
-        rc = mCommFabric->grouping(true, mParallelInfo, uri);
+        rc = mCommFabric->grouping(true, gfsObj->getParallelInfo(), uri);
     }
 
     return rc;

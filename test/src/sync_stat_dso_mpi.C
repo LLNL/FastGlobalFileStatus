@@ -14,6 +14,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -33,9 +34,9 @@ extern "C" {
 #include "SyncFastGlobalFileStat.h"
 #include "FgfsTestGetDsoList.h"
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::MountPointAttribute;
-using namespace FastGlobalFileStat::CommLayer;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::MountPointAttribute;
+using namespace FastGlobalFileStatus::CommLayer;
 
 enum TestType {
     tt_is_unique = 0,
@@ -46,7 +47,8 @@ enum TestType {
     tt_unknown
 };
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 
     if (getenv("MPA_TEST_ENABLE_VERBOSE")) {
@@ -68,7 +70,7 @@ int main(int argc, char *argv[])
         MPA_sayMessage("TEST", true, "    testType: 2 check if isWellDistributed");
         MPA_sayMessage("TEST", true, "    testType: 3 check if isFullyDistributed");
         MPA_sayMessage("TEST", true, "    testType: 4 check if isConsistent");
-        exit(1);
+        return EXIT_FAILURE;
     }
 
     TestType tt = (TestType) atoi(argv[1]);
@@ -97,7 +99,7 @@ int main(int argc, char *argv[])
                            "getDependentDSOs returned a neg value.");
 
             MPI_Finalize();
-            exit(1);
+            return EXIT_FAILURE;
         }
 
         for (it = dLibs.begin(); it != dLibs.end(); it++) {
@@ -143,7 +145,7 @@ int main(int argc, char *argv[])
         MPA_sayMessage("TEST",
                        true,
                        "MPICommFabric::initialize returned false");
-        exit(1);
+        return EXIT_FAILURE;
     }
     CommFabric *cfab = new MPICommFabric();
 
@@ -156,24 +158,25 @@ int main(int argc, char *argv[])
     uint32_t startTime;
     if (!rank) startTime = stampstart();
 
-    rc = SyncGlobalFileStat::initialize(fsig, cfab);
+    rc = SyncGlobalFileStatus::initialize(fsig, cfab);
 
     if (!rc) {
         MPA_sayMessage("TEST",
                        true,
-                       "SyncGlobalFileStat::initialize returned false");
+                       "SyncGlobalFileStatus::initialize returned false");
         MPI_Finalize();
-        exit(1);
+        return EXIT_FAILURE;
     }
 
     int nHit = 0;
     for (it = dRealpathLibs.begin(); it != dRealpathLibs.end(); it++) {
-        SyncGlobalFileStat myStat((*it).c_str());
+        SyncGlobalFileStatus myStat((*it).c_str());
         if (!myStat.triage()) {
             MPA_sayMessage("TEST",
                            true,
                            "triage failed.");
             MPI_Finalize();
+	    return EXIT_FAILURE;
         }
 
         switch (tt) {
@@ -267,9 +270,7 @@ int main(int argc, char *argv[])
     cfab = NULL;
 
     MPI_Finalize();
-
     return EXIT_SUCCESS;
-
 }
 
 

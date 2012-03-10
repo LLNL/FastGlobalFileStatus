@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ncore_per_node=12
-mach_name="sierra"
+ncore_per_node=16
+mach_name="zin"
 
 if [ $# -eq 1 ]
 then
@@ -9,14 +9,12 @@ ncore_per_node=$1
 mach_name=$2
 fi
 
-#app_names="kull"
 app_names="ale3d ares kull"
 testers="async_stat_dso_mrnet"
 fgfs_ops="0 1 2 3"
-#be_count="144"
-be_count="144 256 512 1331 2197 4096 10000 14641"
+be_count="512 1000 4096 10000 14641 20736 28561"
 dir_ptr="FGFS.Scaling"
-cP2FoRatio=3
+branchPerCore=3
 rootpath=`pwd`
 
 
@@ -37,14 +35,15 @@ for etype in $testers ; do
                  testpath=$rootpath/$dir_ptr/$etype/$app/$scale/$tOp
                  mkdir $testpath
                  ln -s ../../../../../../$etype $testpath/
-                 height=`mrnet_node_req 1 $scale $ncore_per_node $cP2FoRatio`
-                 fanout=`mrnet_node_req 2 $scale $ncore_per_node $cP2FoRatio`
-                 totalBENum=`mrnet_node_req 3 $scale $ncore_per_node $cP2FoRatio`
-                 totalCPNum=`mrnet_node_req 4 $scale $ncore_per_node $cP2FoRatio`
-                 totalBENodeNum=`mrnet_node_req 5 $scale $ncore_per_node $cP2FoRatio`
-                 totalCPNodeNum=`mrnet_node_req 6 $scale $ncore_per_node $cP2FoRatio`
-                 totalNodeNum=`mrnet_node_req 7 $scale $ncore_per_node $cP2FoRatio`
-                 usingCorePerNodeCP=`mrnet_node_req 8 $scale $ncore_per_node $cP2FoRatio`
+                 height=`mrnet_node_req 1 $scale $ncore_per_node $branchPerCore`
+                 fanout=`mrnet_node_req 2 $scale $ncore_per_node $branchPerCore`
+                 totalBENum=`mrnet_node_req 3 $scale $ncore_per_node $branchPerCore`
+                 totalCPNum=`mrnet_node_req 4 $scale $ncore_per_node $branchPerCore`
+                 totalBENodeNum=`mrnet_node_req 5 $scale $ncore_per_node $branchPerCore`
+                 coreToUsePerBENode=`mrnet_node_req 6 $scale $ncore_per_node $branchPerCore`
+                 totalCPOnlyNodeNum=`mrnet_node_req 7 $scale $ncore_per_node $branchPerCore`
+                 totalNodeNum=`mrnet_node_req 8 $scale $ncore_per_node $branchPerCore`
+                 corePerCp=`mrnet_node_req 9 $scale $ncore_per_node $branchPerCore`
 
                  apppath=""
                  if [ $app = "kull" ]
@@ -68,9 +67,10 @@ for etype in $testers ; do
 	             -e "s,@FAN_OUT@,$fanout,g" \
 	             -e "s,@HEI@,$height,g" \
 	             -e "s,@CORE_COUNT@,$ncore_per_node,g" \
-	             -e "s,@CP_NCOUNT@,$totalCPNodeNum,g" \
-	             -e "s,@NCPS@,$totalCPNum,g" \
+	             -e "s,@CPONLY_NCOUNT@,$totalCPOnlyNodeNum,g" \
+	             -e "s,@COREPERCP@,$corePerCp,g" \
 	             -e "s,@NBES@,$totalBENum,g" \
+                     -e "s,@CORE_TO_USE_PER_BENODE@,$coreToUsePerBENode,g" \
 	             -e "s,@APP@,$app,g" \
                      -e "s,@RTPATH@,$rootpath,g" \
                      -e "s,@TOT_NC@,$totalNodeNum,g" < run.fgfs_tester.sh.in > run.fgfs_tester.sh

@@ -15,9 +15,9 @@
 #include <iostream>
 #include <map>
 
-using namespace FastGlobalFileStat;
-using namespace FastGlobalFileStat::CommLayer;
-using namespace FastGlobalFileStat::MountPointAttribute;
+using namespace FastGlobalFileStatus;
+using namespace FastGlobalFileStatus::CommLayer;
+using namespace FastGlobalFileStatus::MountPointAttribute;
 using namespace MRN;
 
 
@@ -37,7 +37,7 @@ FgfsCount_t MRNetCommFabric::mSizeCache = FGFS_NOT_FILLED;
 
 ///////////////////////////////////////////////////////////////////
 //
-//  PUBLIC INTERFACE:   namespace FastGlobalFileStat::CommLayer
+//  PUBLIC INTERFACE:   namespace FastGlobalFileStatus::CommLayer
 //
 //
 
@@ -434,7 +434,7 @@ MRNetCommFabric::getChannel()
 
 ///////////////////////////////////////////////////////////////////
 //
-//  PRIVATE INTERFACE:   namespace FastGlobalFileStat::CommLayer
+//  PRIVATE INTERFACE:   namespace FastGlobalFileStatus::CommLayer
 //
 //
 
@@ -495,7 +495,7 @@ MRNetCommFabric::allReduceFE(unsigned char *sendBuf,
     }
 
     if (!(reduceFinal(sendBuf, sendByteLen,
-                      ucharArray, ucharLen,
+                      ucharArray, (unsigned int) ucharLen,
                       &retBuf, &retBufLen, oPType)) ) {
         if (ChkVerbose(1)) {
             MPA_sayMessage("MRNetCommFabric",
@@ -646,6 +646,10 @@ MRNetCommFabric::getMRNetMsgType(ReduceDataType t, ReduceOperator op) const
             rOp = MMT_op_allreduce_int_max;
             break;
 
+        case REDUCE_MIN:
+            rOp = MMT_op_allreduce_int_min;
+            break;
+
         case REDUCE_SUM:
             rOp = MMT_op_allreduce_int_sum;
             break;
@@ -660,6 +664,10 @@ MRNetCommFabric::getMRNetMsgType(ReduceDataType t, ReduceOperator op) const
         switch (op) {
         case REDUCE_MAX:
             rOp = MMT_op_allreduce_long_long_max;
+            break;
+
+        case REDUCE_MIN:
+            rOp = MMT_op_allreduce_long_long_min;
             break;
 
         case REDUCE_SUM:

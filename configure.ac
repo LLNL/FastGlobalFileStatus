@@ -12,7 +12,7 @@ dnl         June 29 2011 DHA: File created.
 dnl                          
 
 AC_PREREQ(2.59)
-AC_INIT(FastGlobalFileStat, 1.0, ahn1@llnl.gov)
+AC_INIT(FastGlobalFileStatus, 1.0, ahn1@llnl.gov)
 dnl Version numbers, remember to change them just *before* a release. 
 dnl (Interfaces removed: CURRENT++, AGE=0, REVISION=0)
 dnl (Interfaces added: CURRENT++, AGE++, REVISION=0)
@@ -26,7 +26,7 @@ AC_SUBST(FGFS_AGE)
 AC_CONFIG_AUX_DIR([config]) 
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE(FastGlobalFileStat, 1.0)
+AM_INIT_AUTOMAKE(FastGlobalFileStatus, 1.0)
 AM_MAINTAINER_MODE([enable])
 AC_CANONICAL_HOST
 
@@ -38,9 +38,15 @@ X_AC_ENABLE_DEBUG
 
 
 dnl -----------------------------------------------
-dnl enable debug support
+dnl Mount Point Attributes support
 dnl -----------------------------------------------
 X_AC_MPA
+
+
+dnl -----------------------------------------------
+dnl Maximum Distribution Degree support
+dnl -----------------------------------------------
+X_AC_DIST_DEGREE
 
 
 dnl -----------------------------------------------
@@ -60,7 +66,7 @@ X_FIND_MPI
 
 
 dnl -----------------------------------------------
-dnl Checks for MPI
+dnl Checks for MRNet
 dnl -----------------------------------------------
 X_AC_MRNET
 

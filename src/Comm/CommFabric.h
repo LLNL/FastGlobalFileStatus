@@ -26,7 +26,7 @@ extern "C" {
 #include "FgfsCommon.h"
 #include "DistDesc.h"
 
-namespace FastGlobalFileStat {
+namespace FastGlobalFileStatus {
 
   namespace CommLayer {
 
@@ -41,6 +41,7 @@ namespace FastGlobalFileStat {
 
     enum ReduceOperator {
         REDUCE_MAX = 0,
+        REDUCE_MIN,
         REDUCE_SUM,
         REDUCE_BOR,
         REDUCE_UNKNOWN_OP
@@ -176,7 +177,7 @@ namespace FastGlobalFileStat {
 
   } // CommLayer namespace
 
-} // FastGlobalFileStat namespace
+} // FastGlobalFileStatus namespace
 
 #endif // COMM_FABRIC_H
 

@@ -15,7 +15,7 @@
 
 #include "FastGlobalFileStat.h"
 
-namespace FastGlobalFileStat {
+namespace FastGlobalFileStatus {
 
     /**
      *   Defines a data type that a tool should derive from
@@ -47,13 +47,13 @@ namespace FastGlobalFileStat {
 
 
     /**
-     *   Provides synchronous abstractions of Fast Global File Stat. 
+     *   Provides synchronous abstractions of Fast Global File Stat.
      */
-    class SyncGlobalFileStat : public GlobalFileStatBase {
+    class SyncGlobalFileStatus : public GlobalFileStatusAPI, public GlobalFileStatusBase {
     public:
 
         /**
-         *   SyncGlobalFileStat Ctor
+         *   SyncGlobalFileStatus Ctor
          *
          *   @param[in] pth an absolute path with no links to a file
          *   @param[in] c CommFabric object
@@ -61,10 +61,10 @@ namespace FastGlobalFileStat {
          *   @param[out] dedicatedChannel opaque channle object
          *   @return none
          */
-        SyncGlobalFileStat(const char *pth);
+        SyncGlobalFileStatus(const char *pth);
 
         /**
-         *   SyncGlobalFileStat Ctor
+         *   SyncGlobalFileStatus Ctor
          *
          *   @param[in] pth an absolute path with no links to a file
          *   @param[in] threshold a process count to staturate the
@@ -75,9 +75,9 @@ namespace FastGlobalFileStat {
          *   @param[out] dedicatedChannel opaque channle object
          *   @return none
          */
-        SyncGlobalFileStat(const char *pth, const int threshold);
+        SyncGlobalFileStatus(const char *pth, const int threshold);
 
-        virtual ~SyncGlobalFileStat();
+        virtual ~SyncGlobalFileStatus();
 
         /**
          *   Class Static Initializer. (Call once for the entire class hierarchy)
@@ -157,19 +157,6 @@ namespace FastGlobalFileStat {
         FGFSInfoAnswer isConsistent(bool serial=false);
 
         /**
-         *   Returns the score for the storage that contains the path
-         *
-         *   @param[in] criteria StorageCriteria object
-         *   @return score when only the spaceRequirement is given, thie method
-         *           uses an internal formula to caculate the score.
-         *           if other optional requirements are given,
-         *           this method returns STORAGE_CLASSIFIER_MIN_MATCH_SCORE
-         *           when matched or less than that value when unmatched.
-         */
-        //const double provideStorageClassification(
-        //                const StorageCriteria &criteria);
-
-        /**
          *   Computes a signiture of the file using the registered
          *   FileSignitureGen object. This function uses a scalable approach
          *   to generate the signiture buffer.
@@ -195,6 +182,8 @@ namespace FastGlobalFileStat {
          *           the caller is responsible for freeing the buffer.
          */
         unsigned char * signitureSerial(struct stat *buf, int *sigSize);
+
+        bool forceComputeParallelInfo( );
 
 
     private:

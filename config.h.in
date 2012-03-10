@@ -105,6 +105,10 @@
 /* Define to header that first defines elf. */
 #undef LOCATION_OF_LIBELFHEADER
 
+/* number of unique file servers serving a logical file path that a cluster
+   can see */
+#undef MAX_DEGREE_DISTRIBUTION
+
 /* MRNet 2.X */
 #undef MRNET2
 

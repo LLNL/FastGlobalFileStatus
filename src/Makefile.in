@@ -42,6 +42,7 @@ DIST_COMMON = $(include_HEADERS) $(nobase_include_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_enable_debug.m4 \
+	$(top_srcdir)/config/x_ac_max_dist_degree.m4 \
 	$(top_srcdir)/config/x_ac_mpa.m4 \
 	$(top_srcdir)/config/x_ac_mrnet.m4 \
 	$(top_srcdir)/config/x_find_mpi.m4 $(top_srcdir)/configure.ac
@@ -66,19 +67,23 @@ am_libfgfs_filter_la_OBJECTS = libfgfs_filter_la-MRNetFilterUp.lo \
 	libfgfs_filter_la-DistDesc.lo
 libfgfs_filter_la_OBJECTS = $(am_libfgfs_filter_la_OBJECTS)
 libfgfs_mpi_la_LIBADD =
-am_libfgfs_mpi_la_OBJECTS = libfgfs_mpi_la-FastGlobalFileStat.lo \
+am_libfgfs_mpi_la_OBJECTS = libfgfs_mpi_la-bloom.lo \
+	libfgfs_mpi_la-CommFabric.lo libfgfs_mpi_la-DistDesc.lo \
+	libfgfs_mpi_la-MPICommFabric.lo \
+	libfgfs_mpi_la-FastGlobalFileStat.lo \
 	libfgfs_mpi_la-SyncFastGlobalFileStat.lo \
+	libfgfs_mpi_la-MountPointsClassifier.lo \
 	libfgfs_mpi_la-AsyncFastGlobalFileStat.lo \
-	libfgfs_mpi_la-bloom.lo libfgfs_mpi_la-CommFabric.lo \
-	libfgfs_mpi_la-DistDesc.lo libfgfs_mpi_la-MPICommFabric.lo
+	libfgfs_mpi_la-StorageClassifier.lo
 libfgfs_mpi_la_OBJECTS = $(am_libfgfs_mpi_la_OBJECTS)
 libfgfs_mrnet_la_LIBADD =
-am_libfgfs_mrnet_la_OBJECTS = libfgfs_mrnet_la-FastGlobalFileStat.lo \
+am_libfgfs_mrnet_la_OBJECTS = libfgfs_mrnet_la-bloom.lo \
+	libfgfs_mrnet_la-CommFabric.lo libfgfs_mrnet_la-DistDesc.lo \
+	libfgfs_mrnet_la-MRNetCommFabric.lo \
+	libfgfs_mrnet_la-FastGlobalFileStat.lo \
 	libfgfs_mrnet_la-SyncFastGlobalFileStat.lo \
-	libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo \
-	libfgfs_mrnet_la-bloom.lo libfgfs_mrnet_la-CommFabric.lo \
-	libfgfs_mrnet_la-DistDesc.lo \
-	libfgfs_mrnet_la-MRNetCommFabric.lo
+	libfgfs_mrnet_la-MountPointsClassifier.lo \
+	libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo
 libfgfs_mrnet_la_OBJECTS = $(am_libfgfs_mrnet_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -229,43 +234,51 @@ nobase_include_HEADERS = Comm/DistDesc.h \
                             Comm/MPICommFabric.h \
                             Comm/MRNetCommFabric.h
 
-include_HEADERS = AsyncFastGlobalFileStat.h \
+include_HEADERS = FastGlobalFileStat.h \
                             SyncFastGlobalFileStat.h \
-                            FastGlobalFileStat.h \
+                            MountPointsClassifier.h \
+                            AsyncFastGlobalFileStat.h \
                             StorageClassifier.h
 
-libfgfs_mpi_la_SOURCES = FastGlobalFileStat.C \
-                            SyncFastGlobalFileStat.C \
-                            AsyncFastGlobalFileStat.C \
-                            bloom.c \
+libfgfs_mpi_la_SOURCES = bloom.c \
                             Comm/CommFabric.C \
                             Comm/DistDesc.C \
-                            Comm/MPICommFabric.C
+                            Comm/MPICommFabric.C \
+                            FastGlobalFileStat.C \
+                            SyncFastGlobalFileStat.C \
+                            MountPointsClassifier.C \
+                            AsyncFastGlobalFileStat.C \
+                            StorageClassifier.C
 
 libfgfs_mpi_la_CFLAGS = $(AM_CFLAGS)
-libfgfs_mpi_la_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS) 
+libfgfs_mpi_la_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
 libfgfs_mpi_la_LDFLAGS = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) $(MPI_CLDFLAGS) \
                             -version-info @FGFS_CURRENT@:@FGFS_REVISION@:@FGFS_AGE@
 
-libfgfs_mrnet_la_SOURCES = FastGlobalFileStat.C \
-                            SyncFastGlobalFileStat.C \
-                            AsyncFastGlobalFileStat.C \
-                            bloom.c \
+
+#
+# StorageClassification is yet unavailable
+#
+libfgfs_mrnet_la_SOURCES = bloom.c \
                             Comm/CommFabric.C \
                             Comm/DistDesc.C \
-                            Comm/MRNetCommFabric.C
+                            Comm/MRNetCommFabric.C \
+                            FastGlobalFileStat.C \
+                            SyncFastGlobalFileStat.C \
+                            MountPointsClassifier.C \
+                            AsyncFastGlobalFileStat.C
 
 libfgfs_mrnet_la_CFLAGS = $(AM_CFLAGS)
-libfgfs_mrnet_la_CXXFLAGS = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS)
+libfgfs_mrnet_la_CXXFLAGS = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) -fpic
 libfgfs_mrnet_la_LDFLAGS = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) $(MRNET_LDFLAGS) \
                             -version-info @FGFS_CURRENT@:@FGFS_REVISION@:@FGFS_AGE@
 
 libfgfs_filter_la_SOURCES = Comm/MRNetFilterUp.C \
                             Comm/MRNetFilterDown.C \
-                            Comm/DistDesc.C 
+                            Comm/DistDesc.C
 
 libfgfs_filter_la_CFLAGS = $(AM_CFLAGS)
-libfgfs_filter_la_CXXFLAGS = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) 
+libfgfs_filter_la_CXXFLAGS = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS)
 libfgfs_filter_la_LDFLAGS = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) \
                             -version-info @FGFS_CURRENT@:@FGFS_REVISION@:@FGFS_AGE@
 
@@ -350,6 +363,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mpi_la-DistDesc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mpi_la-MPICommFabric.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mpi_la-MountPointsClassifier.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mpi_la-StorageClassifier.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mpi_la-bloom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Plo@am__quote@
@@ -357,6 +372,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mrnet_la-DistDesc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mrnet_la-MRNetCommFabric.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mrnet_la-MountPointsClassifier.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfgfs_mrnet_la-bloom.Plo@am__quote@
 
@@ -402,27 +418,6 @@ libfgfs_filter_la-DistDesc.lo: Comm/DistDesc.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_filter_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_filter_la-DistDesc.lo `test -f 'Comm/DistDesc.C' || echo '$(srcdir)/'`Comm/DistDesc.C
 
-libfgfs_mpi_la-FastGlobalFileStat.lo: FastGlobalFileStat.C
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-FastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Tpo" -c -o libfgfs_mpi_la-FastGlobalFileStat.lo `test -f 'FastGlobalFileStat.C' || echo '$(srcdir)/'`FastGlobalFileStat.C; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FastGlobalFileStat.C' object='libfgfs_mpi_la-FastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-FastGlobalFileStat.lo `test -f 'FastGlobalFileStat.C' || echo '$(srcdir)/'`FastGlobalFileStat.C
-
-libfgfs_mpi_la-SyncFastGlobalFileStat.lo: SyncFastGlobalFileStat.C
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-SyncFastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Tpo" -c -o libfgfs_mpi_la-SyncFastGlobalFileStat.lo `test -f 'SyncFastGlobalFileStat.C' || echo '$(srcdir)/'`SyncFastGlobalFileStat.C; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SyncFastGlobalFileStat.C' object='libfgfs_mpi_la-SyncFastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-SyncFastGlobalFileStat.lo `test -f 'SyncFastGlobalFileStat.C' || echo '$(srcdir)/'`SyncFastGlobalFileStat.C
-
-libfgfs_mpi_la-AsyncFastGlobalFileStat.lo: AsyncFastGlobalFileStat.C
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-AsyncFastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-AsyncFastGlobalFileStat.Tpo" -c -o libfgfs_mpi_la-AsyncFastGlobalFileStat.lo `test -f 'AsyncFastGlobalFileStat.C' || echo '$(srcdir)/'`AsyncFastGlobalFileStat.C; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-AsyncFastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mpi_la-AsyncFastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-AsyncFastGlobalFileStat.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='AsyncFastGlobalFileStat.C' object='libfgfs_mpi_la-AsyncFastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-AsyncFastGlobalFileStat.lo `test -f 'AsyncFastGlobalFileStat.C' || echo '$(srcdir)/'`AsyncFastGlobalFileStat.C
-
 libfgfs_mpi_la-CommFabric.lo: Comm/CommFabric.C
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-CommFabric.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-CommFabric.Tpo" -c -o libfgfs_mpi_la-CommFabric.lo `test -f 'Comm/CommFabric.C' || echo '$(srcdir)/'`Comm/CommFabric.C; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-CommFabric.Tpo" "$(DEPDIR)/libfgfs_mpi_la-CommFabric.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-CommFabric.Tpo"; exit 1; fi
@@ -444,26 +439,40 @@ libfgfs_mpi_la-MPICommFabric.lo: Comm/MPICommFabric.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-MPICommFabric.lo `test -f 'Comm/MPICommFabric.C' || echo '$(srcdir)/'`Comm/MPICommFabric.C
 
-libfgfs_mrnet_la-FastGlobalFileStat.lo: FastGlobalFileStat.C
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mrnet_la-FastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Tpo" -c -o libfgfs_mrnet_la-FastGlobalFileStat.lo `test -f 'FastGlobalFileStat.C' || echo '$(srcdir)/'`FastGlobalFileStat.C; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FastGlobalFileStat.C' object='libfgfs_mrnet_la-FastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
+libfgfs_mpi_la-FastGlobalFileStat.lo: FastGlobalFileStat.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-FastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Tpo" -c -o libfgfs_mpi_la-FastGlobalFileStat.lo `test -f 'FastGlobalFileStat.C' || echo '$(srcdir)/'`FastGlobalFileStat.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-FastGlobalFileStat.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FastGlobalFileStat.C' object='libfgfs_mpi_la-FastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mrnet_la-FastGlobalFileStat.lo `test -f 'FastGlobalFileStat.C' || echo '$(srcdir)/'`FastGlobalFileStat.C
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-FastGlobalFileStat.lo `test -f 'FastGlobalFileStat.C' || echo '$(srcdir)/'`FastGlobalFileStat.C
 
-libfgfs_mrnet_la-SyncFastGlobalFileStat.lo: SyncFastGlobalFileStat.C
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mrnet_la-SyncFastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Tpo" -c -o libfgfs_mrnet_la-SyncFastGlobalFileStat.lo `test -f 'SyncFastGlobalFileStat.C' || echo '$(srcdir)/'`SyncFastGlobalFileStat.C; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SyncFastGlobalFileStat.C' object='libfgfs_mrnet_la-SyncFastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
+libfgfs_mpi_la-SyncFastGlobalFileStat.lo: SyncFastGlobalFileStat.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-SyncFastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Tpo" -c -o libfgfs_mpi_la-SyncFastGlobalFileStat.lo `test -f 'SyncFastGlobalFileStat.C' || echo '$(srcdir)/'`SyncFastGlobalFileStat.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-SyncFastGlobalFileStat.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SyncFastGlobalFileStat.C' object='libfgfs_mpi_la-SyncFastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mrnet_la-SyncFastGlobalFileStat.lo `test -f 'SyncFastGlobalFileStat.C' || echo '$(srcdir)/'`SyncFastGlobalFileStat.C
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-SyncFastGlobalFileStat.lo `test -f 'SyncFastGlobalFileStat.C' || echo '$(srcdir)/'`SyncFastGlobalFileStat.C
 
-libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo: AsyncFastGlobalFileStat.C
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Tpo" -c -o libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo `test -f 'AsyncFastGlobalFileStat.C' || echo '$(srcdir)/'`AsyncFastGlobalFileStat.C; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='AsyncFastGlobalFileStat.C' object='libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
+libfgfs_mpi_la-MountPointsClassifier.lo: MountPointsClassifier.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-MountPointsClassifier.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-MountPointsClassifier.Tpo" -c -o libfgfs_mpi_la-MountPointsClassifier.lo `test -f 'MountPointsClassifier.C' || echo '$(srcdir)/'`MountPointsClassifier.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-MountPointsClassifier.Tpo" "$(DEPDIR)/libfgfs_mpi_la-MountPointsClassifier.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-MountPointsClassifier.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='MountPointsClassifier.C' object='libfgfs_mpi_la-MountPointsClassifier.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo `test -f 'AsyncFastGlobalFileStat.C' || echo '$(srcdir)/'`AsyncFastGlobalFileStat.C
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-MountPointsClassifier.lo `test -f 'MountPointsClassifier.C' || echo '$(srcdir)/'`MountPointsClassifier.C
+
+libfgfs_mpi_la-AsyncFastGlobalFileStat.lo: AsyncFastGlobalFileStat.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-AsyncFastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-AsyncFastGlobalFileStat.Tpo" -c -o libfgfs_mpi_la-AsyncFastGlobalFileStat.lo `test -f 'AsyncFastGlobalFileStat.C' || echo '$(srcdir)/'`AsyncFastGlobalFileStat.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-AsyncFastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mpi_la-AsyncFastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-AsyncFastGlobalFileStat.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='AsyncFastGlobalFileStat.C' object='libfgfs_mpi_la-AsyncFastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-AsyncFastGlobalFileStat.lo `test -f 'AsyncFastGlobalFileStat.C' || echo '$(srcdir)/'`AsyncFastGlobalFileStat.C
+
+libfgfs_mpi_la-StorageClassifier.lo: StorageClassifier.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mpi_la-StorageClassifier.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mpi_la-StorageClassifier.Tpo" -c -o libfgfs_mpi_la-StorageClassifier.lo `test -f 'StorageClassifier.C' || echo '$(srcdir)/'`StorageClassifier.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mpi_la-StorageClassifier.Tpo" "$(DEPDIR)/libfgfs_mpi_la-StorageClassifier.Plo"; else rm -f "$(DEPDIR)/libfgfs_mpi_la-StorageClassifier.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='StorageClassifier.C' object='libfgfs_mpi_la-StorageClassifier.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mpi_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mpi_la-StorageClassifier.lo `test -f 'StorageClassifier.C' || echo '$(srcdir)/'`StorageClassifier.C
 
 libfgfs_mrnet_la-CommFabric.lo: Comm/CommFabric.C
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mrnet_la-CommFabric.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mrnet_la-CommFabric.Tpo" -c -o libfgfs_mrnet_la-CommFabric.lo `test -f 'Comm/CommFabric.C' || echo '$(srcdir)/'`Comm/CommFabric.C; \
@@ -485,6 +494,34 @@ libfgfs_mrnet_la-MRNetCommFabric.lo: Comm/MRNetCommFabric.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Comm/MRNetCommFabric.C' object='libfgfs_mrnet_la-MRNetCommFabric.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mrnet_la-MRNetCommFabric.lo `test -f 'Comm/MRNetCommFabric.C' || echo '$(srcdir)/'`Comm/MRNetCommFabric.C
+
+libfgfs_mrnet_la-FastGlobalFileStat.lo: FastGlobalFileStat.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mrnet_la-FastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Tpo" -c -o libfgfs_mrnet_la-FastGlobalFileStat.lo `test -f 'FastGlobalFileStat.C' || echo '$(srcdir)/'`FastGlobalFileStat.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mrnet_la-FastGlobalFileStat.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FastGlobalFileStat.C' object='libfgfs_mrnet_la-FastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mrnet_la-FastGlobalFileStat.lo `test -f 'FastGlobalFileStat.C' || echo '$(srcdir)/'`FastGlobalFileStat.C
+
+libfgfs_mrnet_la-SyncFastGlobalFileStat.lo: SyncFastGlobalFileStat.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mrnet_la-SyncFastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Tpo" -c -o libfgfs_mrnet_la-SyncFastGlobalFileStat.lo `test -f 'SyncFastGlobalFileStat.C' || echo '$(srcdir)/'`SyncFastGlobalFileStat.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mrnet_la-SyncFastGlobalFileStat.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SyncFastGlobalFileStat.C' object='libfgfs_mrnet_la-SyncFastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mrnet_la-SyncFastGlobalFileStat.lo `test -f 'SyncFastGlobalFileStat.C' || echo '$(srcdir)/'`SyncFastGlobalFileStat.C
+
+libfgfs_mrnet_la-MountPointsClassifier.lo: MountPointsClassifier.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mrnet_la-MountPointsClassifier.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mrnet_la-MountPointsClassifier.Tpo" -c -o libfgfs_mrnet_la-MountPointsClassifier.lo `test -f 'MountPointsClassifier.C' || echo '$(srcdir)/'`MountPointsClassifier.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mrnet_la-MountPointsClassifier.Tpo" "$(DEPDIR)/libfgfs_mrnet_la-MountPointsClassifier.Plo"; else rm -f "$(DEPDIR)/libfgfs_mrnet_la-MountPointsClassifier.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='MountPointsClassifier.C' object='libfgfs_mrnet_la-MountPointsClassifier.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mrnet_la-MountPointsClassifier.lo `test -f 'MountPointsClassifier.C' || echo '$(srcdir)/'`MountPointsClassifier.C
+
+libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo: AsyncFastGlobalFileStat.C
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -MT libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo -MD -MP -MF "$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Tpo" -c -o libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo `test -f 'AsyncFastGlobalFileStat.C' || echo '$(srcdir)/'`AsyncFastGlobalFileStat.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Tpo" "$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Plo"; else rm -f "$(DEPDIR)/libfgfs_mrnet_la-AsyncFastGlobalFileStat.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='AsyncFastGlobalFileStat.C' object='libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfgfs_mrnet_la_CXXFLAGS) $(CXXFLAGS) -c -o libfgfs_mrnet_la-AsyncFastGlobalFileStat.lo `test -f 'AsyncFastGlobalFileStat.C' || echo '$(srcdir)/'`AsyncFastGlobalFileStat.C
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

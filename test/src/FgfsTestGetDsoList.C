@@ -12,6 +12,7 @@
 extern "C" {
 # include "config.h"
 # include <unistd.h>
+# include <stdlib.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>
@@ -26,6 +27,7 @@ extern "C" {
 
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "MountPointAttr.h"
 
 #if __x86_64__
@@ -45,7 +47,7 @@ const char *DFLT_LIB_PATH = "/lib:/usr/lib";
 # define myelf_getshdr elf32_getshdr
 #endif
 
-using namespace FastGlobalFileStat::MountPointAttribute;
+using namespace FastGlobalFileStatus::MountPointAttribute;
 
 int
 getDependentDSOs (const std::string &execPath, std::vector<std::string> &dlibs)
@@ -237,8 +239,9 @@ getDependentDSOs (const std::string &execPath, std::vector<std::string> &dlibs)
         t = tllp;
         while ( (tok = strtok(t, ":")) != NULL ) {
             std::string apath((char *)tok);  
-            if (std::find(ld_lib_path.begin(), ld_lib_path.end(), apath) == ld_lib_path.end()) {
-                ld_lib_path.push_back(apath);
+            if (std::find(ld_lib_path.begin(), ld_lib_path.end(), apath) 
+		== ld_lib_path.end()) {
+	      ld_lib_path.push_back(apath);
             }
             t = NULL;
         }
@@ -253,8 +256,9 @@ getDependentDSOs (const std::string &execPath, std::vector<std::string> &dlibs)
         t = tllp;
         while ( (tok = strtok(t, ":")) != NULL ) {
             std::string apath(tok);
-            if (std::find(ld_lib_path.begin(), ld_lib_path.end(), apath) == ld_lib_path.end()) {
-                ld_lib_path.push_back(apath);
+            if (std::find(ld_lib_path.begin(), ld_lib_path.end(), apath) 
+		== ld_lib_path.end()) {
+	      ld_lib_path.push_back(apath);
             }
             t = NULL;
         }
@@ -268,8 +272,9 @@ getDependentDSOs (const std::string &execPath, std::vector<std::string> &dlibs)
     t = tllp;
     while ( (tok = strtok(t, ":")) != NULL) {
         std::string apath(tok);
-        if (std::find(ld_lib_path.begin(), ld_lib_path.end(), apath) == ld_lib_path.end()) {
-            ld_lib_path.push_back(apath);
+        if (std::find(ld_lib_path.begin(), ld_lib_path.end(), apath) 
+	    == ld_lib_path.end()) {
+	  ld_lib_path.push_back(apath);
         }
         t = NULL;
     }
