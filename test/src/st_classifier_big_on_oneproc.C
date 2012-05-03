@@ -40,17 +40,17 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     CommFabric *cfab = new MPICommFabric();
-    StorageClassifier::initialize(cfab);
+    GlobalFileSystemsStatus::initialize(cfab);
 
-    StorageClassifier sClassifer;
+    GlobalFileSystemsStatus sClassifer;
 
     // each process asks for 1MB except for rank 1
-    StorageCriteria sCriteria1(oneMB);
-    StorageCriteria sCriteria2(oneMB);
-    StorageCriteria sCriteria3(oneMB);
-    StorageCriteria sCriteria4(oneMB);
-    StorageCriteria sCriteria5(oneMB);
-    StorageCriteria sCriteria6(oneMB);
+    FileSystemsCriteria sCriteria1(oneMB);
+    FileSystemsCriteria sCriteria2(oneMB);
+    FileSystemsCriteria sCriteria3(oneMB);
+    FileSystemsCriteria sCriteria4(oneMB);
+    FileSystemsCriteria sCriteria5(oneMB);
+    FileSystemsCriteria sCriteria6(oneMB);
     if (rank == 1) {
         sCriteria1.setSpaceRequirement(4*oneGB,0);
         sCriteria2.setSpaceRequirement(8*oneGB,0);
@@ -71,12 +71,12 @@ int main(int argc, char *argv[])
     // Constant size memory needed per process and rely on
     // default requirements for other parameters
     //
-    sClassifer.provideBestStorage(sCriteria1, matchVector1);
-    sClassifer.provideBestStorage(sCriteria2, matchVector2);
-    sClassifer.provideBestStorage(sCriteria3, matchVector3);
-    sClassifer.provideBestStorage(sCriteria4, matchVector4);
-    sClassifer.provideBestStorage(sCriteria5, matchVector5);
-    sClassifer.provideBestStorage(sCriteria6, matchVector6);
+    sClassifer.provideBestFileSystems(sCriteria1, matchVector1);
+    sClassifer.provideBestFileSystems(sCriteria2, matchVector2);
+    sClassifer.provideBestFileSystems(sCriteria3, matchVector3);
+    sClassifer.provideBestFileSystems(sCriteria4, matchVector4);
+    sClassifer.provideBestFileSystems(sCriteria5, matchVector5);
+    sClassifer.provideBestFileSystems(sCriteria6, matchVector6);
 
     if (!rank) {
         int i = 0;

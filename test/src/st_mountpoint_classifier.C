@@ -39,10 +39,10 @@ int main(int argc, char *argv[])
     //
     // Mount Point Classifier runs as part of initialization as well.
     //
-    StorageClassifier::initialize(cfab);
+    GlobalStorageChecker::initialize(cfab);
 
     const MountPointsClassifier &mpClassifier 
-        = StorageClassifier::getMountPointsClassifier();
+        = GlobalFileSystemsStatus::getMountPointsClassifier();
 
     std::map<std::string, GlobalProperties>::const_iterator iter;
     for (iter = mpClassifier.getGlobalMountpointsMap().begin();

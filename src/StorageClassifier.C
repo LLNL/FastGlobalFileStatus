@@ -41,7 +41,7 @@ using namespace FastGlobalFileStatus::CommLayer;
 //  static data
 //
 //
-MountPointsClassifier StorageClassifier::mMpClassifier;
+MountPointsClassifier GlobalFileSystemsStatus::mMpClassifier;
 
 ///////////////////////////////////////////////////////////////////
 //
@@ -52,11 +52,11 @@ MountPointsClassifier StorageClassifier::mMpClassifier;
 
 ///////////////////////////////////////////////////////////////////
 //
-//  class StorageCriteria
+//  class FileSystemsCriteria
 //
 //
 
-StorageCriteria::StorageCriteria()
+FileSystemsCriteria::FileSystemsCriteria()
     : spaceRequirement(0),
       speedRequirement(SPEED_REQUIRE_NONE),
       distributionRequirement(DISTRIBUTED_REQUIRE_NONE),
@@ -65,7 +65,7 @@ StorageCriteria::StorageCriteria()
 
 }
 
-StorageCriteria::StorageCriteria(nbytes_t bytesNeeded,
+FileSystemsCriteria::FileSystemsCriteria(nbytes_t bytesNeeded,
                                  nbytes_t bytesToFree,
                                  SpeedRequirement speed,
                                  DistributionRequirement dist,
@@ -78,7 +78,7 @@ StorageCriteria::StorageCriteria(nbytes_t bytesNeeded,
 }
 
 
-StorageCriteria::StorageCriteria(const StorageCriteria &criteria)
+FileSystemsCriteria::FileSystemsCriteria(const FileSystemsCriteria &criteria)
 {
     spaceRequirement = criteria.spaceRequirement;
     spaceToFree = criteria.spaceToFree;
@@ -88,14 +88,14 @@ StorageCriteria::StorageCriteria(const StorageCriteria &criteria)
 }
 
 
-StorageCriteria::~StorageCriteria()
+FileSystemsCriteria::~FileSystemsCriteria()
 {
 
 }
 
 
 void
-StorageCriteria::setSpaceRequirement(nbytes_t bytesNeeded,
+FileSystemsCriteria::setSpaceRequirement(nbytes_t bytesNeeded,
                                      nbytes_t bytesToFree)
 {
     spaceRequirement = bytesNeeded - bytesToFree;
@@ -103,66 +103,66 @@ StorageCriteria::setSpaceRequirement(nbytes_t bytesNeeded,
 
 
 void
-StorageCriteria::setDistributionRequirement(
-                     StorageCriteria::DistributionRequirement dist)
+FileSystemsCriteria::setDistributionRequirement(
+                     FileSystemsCriteria::DistributionRequirement dist)
 {
     distributionRequirement = dist;
 }
 
 
 void
-StorageCriteria::setSpeedRequirement(
-                     StorageCriteria::SpeedRequirement speed)
+FileSystemsCriteria::setSpeedRequirement(
+                     FileSystemsCriteria::SpeedRequirement speed)
 {
     speedRequirement = speed;
 }
 
 
 void
-StorageCriteria::setScalabilityRequirement(
-                     StorageCriteria::ScalabilityRequirement scale)
+FileSystemsCriteria::setScalabilityRequirement(
+                     FileSystemsCriteria::ScalabilityRequirement scale)
 {
      scalabilityRequirement = scale;
 }
 
 
-const StorageCriteria::SpaceRequirement
-StorageCriteria::getSpaceRequirement() const
+const FileSystemsCriteria::SpaceRequirement
+FileSystemsCriteria::getSpaceRequirement() const
 {
     return spaceRequirement;
 }
 
 
 const nbytes_t
-StorageCriteria::getSpaceToFree() const
+FileSystemsCriteria::getSpaceToFree() const
 {
     return spaceToFree;
 }
 
 
-const StorageCriteria::DistributionRequirement
-StorageCriteria::getDistributionRequirement() const
+const FileSystemsCriteria::DistributionRequirement
+FileSystemsCriteria::getDistributionRequirement() const
 {
     return distributionRequirement;
 }
 
 
-const StorageCriteria::SpeedRequirement
-StorageCriteria::getSpeedRequirement() const
+const FileSystemsCriteria::SpeedRequirement
+FileSystemsCriteria::getSpeedRequirement() const
 {
     return speedRequirement;
 }
 
 
-const StorageCriteria::ScalabilityRequirement
-StorageCriteria::getScalabilityRequirement() const
+const FileSystemsCriteria::ScalabilityRequirement
+FileSystemsCriteria::getScalabilityRequirement() const
 {
     return scalabilityRequirement;
 }
 
 
 bool
-StorageCriteria::isRequireNone() const
+FileSystemsCriteria::isRequireNone() const
 {
     bool rc = false; 
 
@@ -178,39 +178,39 @@ StorageCriteria::isRequireNone() const
 
 ///////////////////////////////////////////////////////////////////
 //
-//  class StorageGlobalFileStatus
+//  class GlobalStorageChecker 
 //
 //
 
-StorageGlobalFileStatus::StorageGlobalFileStatus(const char *pth)
+GlobalStorageChecker::GlobalStorageChecker(const char *pth)
     : SyncGlobalFileStatus(pth)
 {
 
 }
 
 
-StorageGlobalFileStatus::StorageGlobalFileStatus(const char *pth, const int value)
+GlobalStorageChecker::GlobalStorageChecker(const char *pth, const int value)
     : SyncGlobalFileStatus(pth, value)
 {
 
 }
 
 
-StorageGlobalFileStatus::~StorageGlobalFileStatus()
+GlobalStorageChecker::~GlobalStorageChecker()
 {
     // fileSigniture must not be deleted
 }
 
 
 bool
-StorageGlobalFileStatus::initialize(CommFabric *c)
+GlobalStorageChecker::initialize(CommFabric *c)
 {
     return (SyncGlobalFileStatus::initialize(NULL, c));
 }
 
 
 FGFSInfoAnswer
-StorageGlobalFileStatus::meetSpaceRequirement(nbytes_t BytesNeededlocally,
+GlobalStorageChecker::meetSpaceRequirement(nbytes_t BytesNeededlocally,
                                nbytes_t *BytesNeededGlobally,
                                nbytes_t *BytesNeededWithinGroup,
                                nbytes_t *BytesAvailableWithinGroup,
@@ -367,29 +367,29 @@ has_error:
 
 ///////////////////////////////////////////////////////////////////
 //
-//  class StorageClassifier
+//  class GlobalFileSystemsStatus
 //
 //
 
 
-StorageClassifier::StorageClassifier( )
+GlobalFileSystemsStatus::GlobalFileSystemsStatus( )
     : mHasErr(false)
 {
 
 }
 
 
-StorageClassifier::~StorageClassifier()
+GlobalFileSystemsStatus::~GlobalFileSystemsStatus()
 {
 
 }
 
 
 bool
-StorageClassifier::initialize(CommLayer::CommFabric *c)
+GlobalFileSystemsStatus::initialize(CommLayer::CommFabric *c)
 {
     bool rc;
-    if (rc = StorageGlobalFileStatus::initialize(c)) {
+    if (rc = GlobalStorageChecker::initialize(c)) {
         rc = mMpClassifier.runClassification(c);
     }
     return rc;
@@ -403,7 +403,7 @@ bool sortPredicate(const MyMntEntWScore &d1, const MyMntEntWScore &d2)
 
 
 bool
-StorageClassifier::provideBestStorage(const StorageCriteria &criteria,
+GlobalFileSystemsStatus::provideBestFileSystems(const FileSystemsCriteria &criteria,
                        std::vector<MyMntEntWScore> &match)
 {
     int i = 0;
@@ -434,7 +434,7 @@ StorageClassifier::provideBestStorage(const StorageCriteria &criteria,
 
 
 const MountPointsClassifier &
-StorageClassifier::getMountPointsClassifier() 
+GlobalFileSystemsStatus::getMountPointsClassifier() 
 {
     return mMpClassifier;    
 }
@@ -448,9 +448,9 @@ StorageClassifier::getMountPointsClassifier()
 
 
 int
-StorageClassifier::scoreStorage(const std::string &pth,
+GlobalFileSystemsStatus::scoreStorage(const std::string &pth,
                                 const GlobalProperties &gps,
-                                const StorageCriteria &criteria)
+                                const FileSystemsCriteria &criteria)
 {
     //
     // Score for the spaceReq: if space not there, all bets are off
@@ -493,7 +493,7 @@ StorageClassifier::scoreStorage(const std::string &pth,
 
 
 int
-StorageClassifier::checkSpaceReq(const std::string &pth,
+GlobalFileSystemsStatus::checkSpaceReq(const std::string &pth,
                        const GlobalProperties &gps,
                        const nbytes_t space,
                        int *distEst)
@@ -503,7 +503,7 @@ StorageClassifier::checkSpaceReq(const std::string &pth,
     nbytes_t bytesNeededWithinGroup;
     nbytes_t bytesAvailableWithinGroup;
 
-    StorageGlobalFileStatus sgf(pth.c_str());
+    GlobalStorageChecker sgf(pth.c_str());
 
     sgf.triage();
 
@@ -522,24 +522,24 @@ StorageClassifier::checkSpaceReq(const std::string &pth,
 
 
 int
-StorageClassifier::scoreWSpeedReq(const std::string &pth,
+GlobalFileSystemsStatus::scoreWSpeedReq(const std::string &pth,
                        const GlobalProperties &gps,
-                       const StorageCriteria::SpeedRequirement speed)
+                       const FileSystemsCriteria::SpeedRequirement speed)
 {
     int score = STORAGE_CLASSIFIER_REQ_UNMET_SCORE;
 
     switch (speed) {
-    case StorageCriteria::SPEED_REQUIRE_NONE:
+    case FileSystemsCriteria::SPEED_REQUIRE_NONE:
         score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         break;
 
-    case StorageCriteria::SPEED_LOW:
+    case FileSystemsCriteria::SPEED_LOW:
         if (gps.getFsSpeed() == BASE_FS_SPEED) {
             score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         }
         break;
 
-    case StorageCriteria::SPEED_HIGH:
+    case FileSystemsCriteria::SPEED_HIGH:
         if (gps.getFsSpeed() > BASE_FS_SPEED) {
             score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         }
@@ -554,30 +554,30 @@ StorageClassifier::scoreWSpeedReq(const std::string &pth,
 
 
 int
-StorageClassifier::scoreWDistributionReq(const std::string &pth,
+GlobalFileSystemsStatus::scoreWDistributionReq(const std::string &pth,
                        const GlobalProperties &gps,
-                       const StorageCriteria::DistributionRequirement dist)
+                       const FileSystemsCriteria::DistributionRequirement dist)
 {
     int score = STORAGE_CLASSIFIER_REQ_UNMET_SCORE;
 
     switch (dist) {
-    case StorageCriteria::DISTRIBUTED_REQUIRE_NONE:
+    case FileSystemsCriteria::DISTRIBUTED_REQUIRE_NONE:
         score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         break;
 
-    case StorageCriteria::DISTRIBUTED_UNIQUE:
+    case FileSystemsCriteria::DISTRIBUTED_UNIQUE:
         if (gps.getUnique()) {
             score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         }
         break;
 
-    case StorageCriteria::DISTRIBUTED_LOW:
+    case FileSystemsCriteria::DISTRIBUTED_LOW:
         if (gps.getPoorlyDist()) {
             score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         }
         break;
 
-    case StorageCriteria::DISTRIBUTED_HIGH:
+    case FileSystemsCriteria::DISTRIBUTED_HIGH:
         if (gps.getWellDist()) {
             score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         }
@@ -592,24 +592,24 @@ StorageClassifier::scoreWDistributionReq(const std::string &pth,
 
 
 int
-StorageClassifier::scoreWScalabilityReq(const std::string &pth,
+GlobalFileSystemsStatus::scoreWScalabilityReq(const std::string &pth,
                        const GlobalProperties &gps,
-                       const StorageCriteria::ScalabilityRequirement scale)
+                       const FileSystemsCriteria::ScalabilityRequirement scale)
 {
     int score = STORAGE_CLASSIFIER_REQ_UNMET_SCORE;
 
     switch (scale) {
-    case StorageCriteria::FS_SCAL_REQUIRE_NONE:
+    case FileSystemsCriteria::FS_SCAL_REQUIRE_NONE:
         score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         break;
 
-    case StorageCriteria::FS_SCAL_SINGLE:
+    case FileSystemsCriteria::FS_SCAL_SINGLE:
         if (gps.getFsScalability() == BASE_FS_SCALABILITY) {
             score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         }
         break;
 
-    case StorageCriteria::FS_SCAL_MULTI:
+    case FileSystemsCriteria::FS_SCAL_MULTI:
         if (gps.getFsScalability() > BASE_FS_SCALABILITY) {
             score = STORAGE_CLASSIFIER_REQ_MET_SCORE;
         }
@@ -621,3 +621,4 @@ StorageClassifier::scoreWScalabilityReq(const std::string &pth,
 
     return score;
 }
+

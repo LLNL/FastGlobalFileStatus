@@ -17,6 +17,8 @@
 #include <mpi.h>
 #include "CommFabric.h"
 
+extern double accumTime;
+
 namespace FastGlobalFileStatus {
 
   namespace CommLayer {
@@ -26,7 +28,6 @@ namespace FastGlobalFileStatus {
      *   Defines a msg tag used for custom reduction
      */
     const int FGFS_CUSTOM_REDUCTION_TAG = 49391;
-
 
     /**
      *

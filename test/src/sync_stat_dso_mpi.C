@@ -211,6 +211,10 @@ main(int argc, char *argv[])
 
     }
     if (!rank) stampstop(startTime);
+    double tmp = 0.0f;
+    MPI_Reduce(&accumTime, &tmp, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    if (!rank) MPA_sayMessage("TEST", false, "max split time: %f", tmp);
+
     ///////////////////////////////////////////////////////////////////////////////
     //                                                                           //
     //                    ****  END MAIN CHECK ****                              //

@@ -30,11 +30,11 @@ namespace FastGlobalFileStatus {
      *   Defines a data type that inherits SynGlobalFileStatus
      *   to help check space requirement for each mount-point-path.
      */
-    class StorageGlobalFileStatus : public SyncGlobalFileStatus {
+    class GlobalStorageChecker : public SyncGlobalFileStatus {
     public:
 
         /**
-         *   StorageGlobalFileStatus Ctor
+         *   GlobalStorageChecker Ctor
          *
          *   @param[in] pth an absolute path with no links to a file
          *   @param[in] c CommFabric object
@@ -42,10 +42,10 @@ namespace FastGlobalFileStatus {
          *   @param[out] dedicatedChannel opaque channle object
          *   @return none
          */
-        StorageGlobalFileStatus(const char *pth);
+       GlobalStorageChecker(const char *pth);
 
         /**
-         *   StorageGlobalFileStatus Ctor
+         *   GlobalStorageChecker Ctor
          *
          *   @param[in] pth an absolute path with no links to a file
          *   @param[in] threshold a process count to staturate the
@@ -56,9 +56,9 @@ namespace FastGlobalFileStatus {
          *   @param[out] dedicatedChannel opaque channle object
          *   @return none
          */
-        StorageGlobalFileStatus(const char *pth, const int threshold);
+        GlobalStorageChecker(const char *pth, const int threshold);
 
-        virtual ~StorageGlobalFileStatus();
+        virtual ~GlobalStorageChecker();
 
         /**
          *   Class Static Initializer. (Call once for the entire class hierarchy)
@@ -83,7 +83,7 @@ namespace FastGlobalFileStatus {
      *   Defines a data type to specify storage selection criteria.
      *   spaceRequirement is the only mandatory requirement to set
      */
-    class StorageCriteria {
+    class FileSystemsCriteria {
     public:
 
         typedef nbytes_t SpaceRequirement;
@@ -113,17 +113,17 @@ namespace FastGlobalFileStatus {
             FS_SCAL_MULTI      = 0x00000008  /*!< Requires parallel storage */
         };
 
-        StorageCriteria();
+        FileSystemsCriteria();
 
-        StorageCriteria(nbytes_t bytesNeeded,
+        FileSystemsCriteria(nbytes_t bytesNeeded,
                         nbytes_t bytesFree=0,
                         SpeedRequirement speed=SPEED_REQUIRE_NONE,
                         DistributionRequirement dist=DISTRIBUTED_REQUIRE_NONE,
                         ScalabilityRequirement scal=FS_SCAL_REQUIRE_NONE);
 
-        StorageCriteria(const StorageCriteria &criteria);
+        FileSystemsCriteria(const FileSystemsCriteria &criteria);
 
-        ~StorageCriteria();
+        ~FileSystemsCriteria();
 
         void setSpaceRequirement(nbytes_t bytesNeeded,
                                  nbytes_t bytesToFree);
@@ -168,16 +168,16 @@ namespace FastGlobalFileStatus {
 
 
     /**
-     *   Defines a data type that provides best storage based
-     *   on the criteria. The provideBestStorage method  and
-     *   provideMatchingStorage are the key abstractions. Note
+     *   Defines a data type that provides best file systems based
+     *   on the criteria. The provideBestFileSystem method  and
+     *   provideMatchingFileSystem are the key abstractions. Note
      *   that users of this class should instantiate an object
      *   through a factory method.
      *
      *   Only one type of constructor is allowed to be called;
      *   an object of this type cannot be copied or assigned.
      */
-    class StorageClassifier : public GlobalFileStatusBase {
+    class GlobalFileSystemsStatus : public GlobalFileStatusBase {
     public:
 
         /**
@@ -227,14 +227,14 @@ namespace FastGlobalFileStatus {
          *   StorageClassifier Ctor
          *   @return none
          */
-        StorageClassifier();
+        GlobalFileSystemsStatus();
 
         /**
          *   StorageClassifier Dtor
          *
          *   @return none
          */
-        virtual ~StorageClassifier();
+        virtual ~GlobalFileSystemsStatus();
 
         /**
          *   Initializer
@@ -252,8 +252,8 @@ namespace FastGlobalFileStatus {
         static const MountPointsClassifier & getMountPointsClassifier();
 
         /**
-         *   Examines all of the storage mounted across all of the
-         *   processes and find matching storage based on the
+         *   Examines all of the file systems mounted across all of the
+         *   processes and find matching file systems based on the
          *   criteria specified through the criteria object. Any of the optional
          *   requirement can be given with this method. Returning mount
          *   point vectors are in descending score order. Moint point with
@@ -267,12 +267,12 @@ namespace FastGlobalFileStatus {
          *   from writing data into the target file system significantly
          *   reducing the free space significantly,
          *
-         *   @param[in] criteria StorageCriteria object
+         *   @param[in] criteria FileSystemsCriteria object
          *   @param[out] match containing matching mount points in descending 
          *                     score order
          *   @return true if no error has been encountered
          */
-        bool provideBestStorage(const StorageCriteria &criteria,
+        bool provideBestFileSystems(const FileSystemsCriteria &criteria,
                      std::vector<MyMntEntWScore> &match);
 
 
@@ -285,11 +285,11 @@ namespace FastGlobalFileStatus {
 
     private:
 
-        StorageClassifier(const StorageClassifier &) {}
+        GlobalFileSystemsStatus(const GlobalFileSystemsStatus &) {}
 
         int scoreStorage(const std::string &pth,
                      const GlobalProperties &gps,
-                     const StorageCriteria &criteria);
+                     const FileSystemsCriteria &criteria);
 
         int checkSpaceReq(const std::string &pth,
                      const GlobalProperties &gps,
@@ -298,15 +298,15 @@ namespace FastGlobalFileStatus {
 
         int scoreWSpeedReq(const std::string &pth,
                      const GlobalProperties &gps,
-                     const StorageCriteria::SpeedRequirement speed);
+                     const FileSystemsCriteria::SpeedRequirement speed);
 
         int scoreWDistributionReq(const std::string &pth,
                      const GlobalProperties &gps,
-                     const StorageCriteria::DistributionRequirement dist);
+                     const FileSystemsCriteria::DistributionRequirement dist);
 
         int scoreWScalabilityReq(const std::string &pth,
                      const GlobalProperties &gps,
-                     const StorageCriteria::ScalabilityRequirement scale);
+                     const FileSystemsCriteria::ScalabilityRequirement scale);
 
         static MountPointsClassifier mMpClassifier;
 

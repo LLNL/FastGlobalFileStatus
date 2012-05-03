@@ -38,21 +38,21 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     CommFabric *cfab = new MPICommFabric();
-    StorageClassifier::initialize(cfab);
+    GlobalFileSystemsStatus::initialize(cfab);
 
     // each process asks for 1MB 
-    StorageCriteria sCriteriaOneMB(oneMB);
+    FileSystemsCriteria sCriteriaOneMB(oneMB);
 
     // each process asks for 1GB 
-    StorageCriteria sCriteriaOneGB(oneGB);
+    FileSystemsCriteria sCriteriaOneGB(oneGB);
 
     // each process asks for 2GB 
-    StorageCriteria sCriteriaTwoGB(2*oneGB);
+    FileSystemsCriteria sCriteriaTwoGB(2*oneGB);
 
     // each process asks for 4GB 
-    StorageCriteria sCriteriaFourGB(4*oneGB);
+    FileSystemsCriteria sCriteriaFourGB(4*oneGB);
 
-    StorageClassifier sClassifer;
+    GlobalFileSystemsStatus sClassifer;
 
     std::vector<MyMntEntWScore> matchVectorMB;
     std::vector<MyMntEntWScore> matchVectorGB;
@@ -63,10 +63,10 @@ int main(int argc, char *argv[])
     // Constant size memory needed per process and rely on
     // default requirements for other parameters
     //
-    sClassifer.provideBestStorage(sCriteriaOneMB, matchVectorMB);
-    sClassifer.provideBestStorage(sCriteriaOneGB, matchVectorGB);
-    sClassifer.provideBestStorage(sCriteriaTwoGB, matchVector2GB);
-    sClassifer.provideBestStorage(sCriteriaFourGB, matchVector4GB);
+    sClassifer.provideBestFileSystems(sCriteriaOneMB, matchVectorMB);
+    sClassifer.provideBestFileSystems(sCriteriaOneGB, matchVectorGB);
+    sClassifer.provideBestFileSystems(sCriteriaTwoGB, matchVector2GB);
+    sClassifer.provideBestFileSystems(sCriteriaFourGB, matchVector4GB);
 
     if (!rank) {
         int i = 0;
