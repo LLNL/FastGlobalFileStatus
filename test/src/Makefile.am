@@ -23,6 +23,7 @@ test_PROGRAMS                  = sync_stat_dso_mpi \
                                  async_stat_dso_mpi \
                                  st_classifier_constmem_per_proc \
                                  st_classifier_big_on_oneproc \
+                                 st_classifier_c_lang \
                                  st_mountpoint_classifier \
                                  async_stat_dso_mrnet \
                                  gen_hostlist \
@@ -70,6 +71,16 @@ st_classifier_constmem_per_proc_SOURCES     = st_classifier_constmem_per_proc.C
 st_classifier_constmem_per_proc_CXXFLAGS    = $(MPI_CFLAGS) $(AM_CXXFLAGS)
 st_classifier_constmem_per_proc_LDFLAGS     = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLAGS)
 st_classifier_constmem_per_proc_LDADD       = @LIBMPA@ -lfgfs_mpi
+
+
+#
+#  ST_CLASSIFIER_C_LANG rules
+#
+st_classifier_c_lang_SOURCES   = st_classifier_c_lang.C \
+                                 g_fs_stat_c_wrap.C
+st_classifier_c_lang_CXXFLAGS  = $(MPI_CFLAGS) $(AM_CXXFLAGS)
+st_classifier_c_lang_LDFLAGS   = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLAGS)
+st_classifier_c_lang_LDADD     = @LIBMPA@ -lfgfs_mpi
 
 
 #

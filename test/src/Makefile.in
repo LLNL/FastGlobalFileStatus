@@ -40,6 +40,7 @@ host_triplet = @host@
 test_PROGRAMS = sync_stat_dso_mpi$(EXEEXT) async_stat_dso_mpi$(EXEEXT) \
 	st_classifier_constmem_per_proc$(EXEEXT) \
 	st_classifier_big_on_oneproc$(EXEEXT) \
+	st_classifier_c_lang$(EXEEXT) \
 	st_mountpoint_classifier$(EXEEXT) \
 	async_stat_dso_mrnet$(EXEEXT) gen_hostlist$(EXEEXT) \
 	mrnet_node_req$(EXEEXT) my_topo_gen$(EXEEXT)
@@ -83,6 +84,11 @@ am_st_classifier_big_on_oneproc_OBJECTS = st_classifier_big_on_oneproc-st_classi
 st_classifier_big_on_oneproc_OBJECTS =  \
 	$(am_st_classifier_big_on_oneproc_OBJECTS)
 st_classifier_big_on_oneproc_DEPENDENCIES =
+am_st_classifier_c_lang_OBJECTS =  \
+	st_classifier_c_lang-st_classifier_c_lang.$(OBJEXT) \
+	st_classifier_c_lang-g_fs_stat_c_wrap.$(OBJEXT)
+st_classifier_c_lang_OBJECTS = $(am_st_classifier_c_lang_OBJECTS)
+st_classifier_c_lang_DEPENDENCIES =
 am_st_classifier_constmem_per_proc_OBJECTS = st_classifier_constmem_per_proc-st_classifier_constmem_per_proc.$(OBJEXT)
 st_classifier_constmem_per_proc_OBJECTS =  \
 	$(am_st_classifier_constmem_per_proc_OBJECTS)
@@ -114,6 +120,7 @@ SOURCES = $(async_stat_dso_mpi_SOURCES) \
 	$(async_stat_dso_mrnet_SOURCES) $(gen_hostlist_SOURCES) \
 	$(mrnet_node_req_SOURCES) $(my_topo_gen_SOURCES) \
 	$(st_classifier_big_on_oneproc_SOURCES) \
+	$(st_classifier_c_lang_SOURCES) \
 	$(st_classifier_constmem_per_proc_SOURCES) \
 	$(st_mountpoint_classifier_SOURCES) \
 	$(sync_stat_dso_mpi_SOURCES)
@@ -121,6 +128,7 @@ DIST_SOURCES = $(async_stat_dso_mpi_SOURCES) \
 	$(async_stat_dso_mrnet_SOURCES) $(gen_hostlist_SOURCES) \
 	$(mrnet_node_req_SOURCES) $(my_topo_gen_SOURCES) \
 	$(st_classifier_big_on_oneproc_SOURCES) \
+	$(st_classifier_c_lang_SOURCES) \
 	$(st_classifier_constmem_per_proc_SOURCES) \
 	$(st_mountpoint_classifier_SOURCES) \
 	$(sync_stat_dso_mpi_SOURCES)
@@ -288,6 +296,16 @@ st_classifier_constmem_per_proc_LDFLAGS = -L@MPALOC@/lib -L$(top_srcdir)/src $(M
 st_classifier_constmem_per_proc_LDADD = @LIBMPA@ -lfgfs_mpi
 
 #
+#  ST_CLASSIFIER_C_LANG rules
+#
+st_classifier_c_lang_SOURCES = st_classifier_c_lang.C \
+                                 g_fs_stat_c_wrap.C
+
+st_classifier_c_lang_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
+st_classifier_c_lang_LDFLAGS = -L@MPALOC@/lib -L$(top_srcdir)/src $(MPI_CLDFLAGS)
+st_classifier_c_lang_LDADD = @LIBMPA@ -lfgfs_mpi
+
+#
 #  ST_CLASSIFIER_BIG_ON_ONEPROC rules
 #
 st_classifier_big_on_oneproc_SOURCES = st_classifier_big_on_oneproc.C
@@ -414,6 +432,9 @@ my_topo_gen$(EXEEXT): $(my_topo_gen_OBJECTS) $(my_topo_gen_DEPENDENCIES)
 st_classifier_big_on_oneproc$(EXEEXT): $(st_classifier_big_on_oneproc_OBJECTS) $(st_classifier_big_on_oneproc_DEPENDENCIES) 
 	@rm -f st_classifier_big_on_oneproc$(EXEEXT)
 	$(CXXLINK) $(st_classifier_big_on_oneproc_LDFLAGS) $(st_classifier_big_on_oneproc_OBJECTS) $(st_classifier_big_on_oneproc_LDADD) $(LIBS)
+st_classifier_c_lang$(EXEEXT): $(st_classifier_c_lang_OBJECTS) $(st_classifier_c_lang_DEPENDENCIES) 
+	@rm -f st_classifier_c_lang$(EXEEXT)
+	$(CXXLINK) $(st_classifier_c_lang_LDFLAGS) $(st_classifier_c_lang_OBJECTS) $(st_classifier_c_lang_LDADD) $(LIBS)
 st_classifier_constmem_per_proc$(EXEEXT): $(st_classifier_constmem_per_proc_OBJECTS) $(st_classifier_constmem_per_proc_DEPENDENCIES) 
 	@rm -f st_classifier_constmem_per_proc$(EXEEXT)
 	$(CXXLINK) $(st_classifier_constmem_per_proc_LDFLAGS) $(st_classifier_constmem_per_proc_OBJECTS) $(st_classifier_constmem_per_proc_LDADD) $(LIBS)
@@ -458,6 +479,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrnet_node_req-mrnet_node_req.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/my_topo_gen-my_topo_gen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st_classifier_big_on_oneproc-st_classifier_big_on_oneproc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st_classifier_constmem_per_proc-st_classifier_constmem_per_proc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st_mountpoint_classifier-st_mountpoint_classifier.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sync_stat_dso_mpi-FgfsTestGetDsoList.Po@am__quote@
@@ -609,6 +632,34 @@ st_classifier_big_on_oneproc-st_classifier_big_on_oneproc.obj: st_classifier_big
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='st_classifier_big_on_oneproc.C' object='st_classifier_big_on_oneproc-st_classifier_big_on_oneproc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_big_on_oneproc_CXXFLAGS) $(CXXFLAGS) -c -o st_classifier_big_on_oneproc-st_classifier_big_on_oneproc.obj `if test -f 'st_classifier_big_on_oneproc.C'; then $(CYGPATH_W) 'st_classifier_big_on_oneproc.C'; else $(CYGPATH_W) '$(srcdir)/st_classifier_big_on_oneproc.C'; fi`
+
+st_classifier_c_lang-st_classifier_c_lang.o: st_classifier_c_lang.C
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_c_lang_CXXFLAGS) $(CXXFLAGS) -MT st_classifier_c_lang-st_classifier_c_lang.o -MD -MP -MF "$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Tpo" -c -o st_classifier_c_lang-st_classifier_c_lang.o `test -f 'st_classifier_c_lang.C' || echo '$(srcdir)/'`st_classifier_c_lang.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Tpo" "$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Po"; else rm -f "$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='st_classifier_c_lang.C' object='st_classifier_c_lang-st_classifier_c_lang.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_c_lang_CXXFLAGS) $(CXXFLAGS) -c -o st_classifier_c_lang-st_classifier_c_lang.o `test -f 'st_classifier_c_lang.C' || echo '$(srcdir)/'`st_classifier_c_lang.C
+
+st_classifier_c_lang-st_classifier_c_lang.obj: st_classifier_c_lang.C
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_c_lang_CXXFLAGS) $(CXXFLAGS) -MT st_classifier_c_lang-st_classifier_c_lang.obj -MD -MP -MF "$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Tpo" -c -o st_classifier_c_lang-st_classifier_c_lang.obj `if test -f 'st_classifier_c_lang.C'; then $(CYGPATH_W) 'st_classifier_c_lang.C'; else $(CYGPATH_W) '$(srcdir)/st_classifier_c_lang.C'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Tpo" "$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Po"; else rm -f "$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='st_classifier_c_lang.C' object='st_classifier_c_lang-st_classifier_c_lang.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_c_lang_CXXFLAGS) $(CXXFLAGS) -c -o st_classifier_c_lang-st_classifier_c_lang.obj `if test -f 'st_classifier_c_lang.C'; then $(CYGPATH_W) 'st_classifier_c_lang.C'; else $(CYGPATH_W) '$(srcdir)/st_classifier_c_lang.C'; fi`
+
+st_classifier_c_lang-g_fs_stat_c_wrap.o: g_fs_stat_c_wrap.C
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_c_lang_CXXFLAGS) $(CXXFLAGS) -MT st_classifier_c_lang-g_fs_stat_c_wrap.o -MD -MP -MF "$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Tpo" -c -o st_classifier_c_lang-g_fs_stat_c_wrap.o `test -f 'g_fs_stat_c_wrap.C' || echo '$(srcdir)/'`g_fs_stat_c_wrap.C; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Tpo" "$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Po"; else rm -f "$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='g_fs_stat_c_wrap.C' object='st_classifier_c_lang-g_fs_stat_c_wrap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_c_lang_CXXFLAGS) $(CXXFLAGS) -c -o st_classifier_c_lang-g_fs_stat_c_wrap.o `test -f 'g_fs_stat_c_wrap.C' || echo '$(srcdir)/'`g_fs_stat_c_wrap.C
+
+st_classifier_c_lang-g_fs_stat_c_wrap.obj: g_fs_stat_c_wrap.C
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_c_lang_CXXFLAGS) $(CXXFLAGS) -MT st_classifier_c_lang-g_fs_stat_c_wrap.obj -MD -MP -MF "$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Tpo" -c -o st_classifier_c_lang-g_fs_stat_c_wrap.obj `if test -f 'g_fs_stat_c_wrap.C'; then $(CYGPATH_W) 'g_fs_stat_c_wrap.C'; else $(CYGPATH_W) '$(srcdir)/g_fs_stat_c_wrap.C'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Tpo" "$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Po"; else rm -f "$(DEPDIR)/st_classifier_c_lang-g_fs_stat_c_wrap.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='g_fs_stat_c_wrap.C' object='st_classifier_c_lang-g_fs_stat_c_wrap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_c_lang_CXXFLAGS) $(CXXFLAGS) -c -o st_classifier_c_lang-g_fs_stat_c_wrap.obj `if test -f 'g_fs_stat_c_wrap.C'; then $(CYGPATH_W) 'g_fs_stat_c_wrap.C'; else $(CYGPATH_W) '$(srcdir)/g_fs_stat_c_wrap.C'; fi`
 
 st_classifier_constmem_per_proc-st_classifier_constmem_per_proc.o: st_classifier_constmem_per_proc.C
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_classifier_constmem_per_proc_CXXFLAGS) $(CXXFLAGS) -MT st_classifier_constmem_per_proc-st_classifier_constmem_per_proc.o -MD -MP -MF "$(DEPDIR)/st_classifier_constmem_per_proc-st_classifier_constmem_per_proc.Tpo" -c -o st_classifier_constmem_per_proc-st_classifier_constmem_per_proc.o `test -f 'st_classifier_constmem_per_proc.C' || echo '$(srcdir)/'`st_classifier_constmem_per_proc.C; \
