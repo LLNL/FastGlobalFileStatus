@@ -26,6 +26,7 @@ using namespace FastGlobalFileStatus::MountPointAttribute;
 //  static data
 //
 //
+double accumTime = 0.0f;
 
 
 ///////////////////////////////////////////////////////////////////
@@ -102,10 +103,15 @@ MPICommFabric::allReduce(bool global,
 
         int key = IS_YES(pd.isRep())? 0 : 1;
 
+        double d1, d2;
+        d1 = MPI_Wtime();
+
         rc = MPI_Comm_split(MPI_COMM_WORLD,
                             pd.getGroupId(),
                             key,
                             &newComm);
+        d2 = MPI_Wtime();
+        accumTime += (d2 - d1);
 
         if (rc == MPI_SUCCESS) {
             rc = MPI_Allreduce((void *) s,
@@ -146,10 +152,15 @@ MPICommFabric::broadcast(bool global, FgfsParDesc &pd,
 
         int key = IS_YES(pd.isRep())? 0 : 1;
 
+        double d1, d2;
+        d1 = MPI_Wtime();
+
         rc = MPI_Comm_split(MPI_COMM_WORLD,
                             pd.getGroupId(),
                             key,
                             &newComm);
+        d2 = MPI_Wtime();
+        accumTime += (d2 - d1);
 
         if (rc == MPI_SUCCESS) {
             rc = MPI_Bcast((void *) b,
