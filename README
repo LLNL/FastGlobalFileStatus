@@ -1,0 +1,136 @@
+## $Header: $
+##
+## Makefile.am -- Process this file with automake to produce Makefile.in 
+##
+## -------------------------------------------------------------------------------- 
+## Copyright (c) 2011 - 2013, Lawrence Livermore National Security, LLC. Produced at
+## the Lawrence Livermore National Laboratory. Written by Dong H. Ahn <ahn1@llnl.gov>. 
+## LLNL-CODE-490173. All rights reserved.
+## 
+## This file is part of MountPointAttributes. 
+## For details, see https://computing.llnl.gov/?set=resources&page=os_projects
+## 
+## Please also read LICENSE - Our Notice and GNU Lesser General Public License.
+## 
+## This program is free software; you can redistribute it and/or modify it under 
+## the terms of the GNU General Public License (as published by the Free Software
+## Foundation) version 2.1 dated February 1999.
+## 
+## This program is distributed in the hope that it will be useful, but WITHOUT ANY
+## WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of the GNU
+## General Public License for more details.
+## 
+## You should have received a copy of the GNU Lesser General Public License along
+## with this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+## Place, Suite 330, Boston, MA 02111-1307 USA
+## -------------------------------------------------------------------------------- 
+##
+##  Update Log:
+##        Apr 29 2013 DHA: File created
+##
+
+1. Fast Global File Status
+   
+     Large-scale systems typically mount many different file systems 
+     with distinct performance characteristics and capacity. High 
+     performance computing (HPC) applications must efficiently use 
+     this storage in order to realize their full performance potential. 
+     Users must take into account potential file replication throughout
+     the storage hierarchy as well as contention in lower levels of the
+     I/O system, and must consider communicating the results of file
+     I/O between application processes to reduce file system accesses.
+     Addressing these issues and optimizing file accesses requires
+     detailed run-time knowledge of file system performance
+     characteristics and the location(s) of files on them.
+
+     We developed Fast Global File Status (FGFS) to provide a scalable
+     mechanism to retrieve such information of a file, including its
+     degree of distribution or replication and consistency. FGFS uses
+     a novel node-local technique that turns expensive, non-scalable
+     file system calls into simple string comparison operations.
+     FGFS raises the namespace of a locally-defined file path to a
+     global namespace with little or no file system calls to obtain
+     global file properties efficiently. Our evaluation on a large
+     multi-physics application showed that most FGFS file status queries
+     on its executable and 848 shared library files complete in 272
+     milliseconds or faster at 32,768 MPI processes. Even the most
+     expensive operation, which checks global file consistency, completes
+     in under 7 seconds at this scale, an improvement of several orders
+     of magnitude over the traditional checksum technique.
+
+
+2. Dependencies
+
+   A. Mount Point Attributes module
+    
+     The main abstractions that enable raising the namespace of local
+     file names are packaged up into the MountPointAttributes module.
+     Because some tools wish to use this module by itself, we have 
+     created its own repostory. 
+
+     You can download the latest version of MountPointAttributes in 
+     Github: http://dongahn.github.io/MountPointAttributes
+
+   B. MRNet
+
+     This package has been ported to both MPI and MRNet. To build the 
+     complete package, you must have MRNet installed on your system. 
+
+   C. OpenSSL
+
+     Fast Global File Status allows its user to define a function that
+     computes consistency between two physically different files. To 
+     develop unit test cases for this functionality, we have used the
+     MD5 function that comes w/ OpenSSL. Thus to build test cases, you 
+     must have OpenSSL on your system. 
+
+
+3. Compatibility
+
+     Fast Global File Status v1.1
+	- MountPointAttributes (v1.1)
+        - MRNet (v3.1.0 and v4.0.0 w/ performance patch)
+	- OpenSSL (v1.0.0)
+
+
+4. Configuration 
+
+     * Please follow README of MountPointAttributes (MPA) to configure, 
+       build and install this dependent module.
+
+     * Assuming MPA has been installed in <your_install_path> and also MPI
+       is available through normal installations, the following command 
+       should configure this package for both MPI and MRNet:
+
+       % mkdir <platform> (e.g., RHEL6_x86_64_ib)
+       % cd <platform>
+       % ../configure --prefix=<your_install_path> \
+                      --with-mrnet=<MRNet installation root> \
+                      --with-max-dist-degree=intVal
+
+       Note that --with-max-dist-degree=intVal sets the maximum number of 
+       remote servers on which a file can be possibly distributed or duplicated. 
+       This should be the site-wide worse case. When the file is served locally 
+       via some local file systems such as RAMDISK, FGFS has ways to 
+       determine this condition. So the maintainer must set this value with respect to
+       the worst "remote-server" case (e.g., a set of NFS file servers serve
+       a file to the processes), which is typically much smaller than the 
+       the worse "local" case. For LLNL Linux clusters, we set this to 20, as 
+       the worst case is when 1 NFS server per scalable unit (156 16-way 
+       compute nodes) serve files to the processes.
+
+       Note that if MPA is installed somewhere other than <your_install_path>, 
+       you can use the optional --with-mpa=<mpa path>.
+
+
+5. Build and Installation
+
+    % make
+    % make install
+
+
+6. Testing (TDB)
+
+
+7. Documents (TDB)

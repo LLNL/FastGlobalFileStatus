@@ -105,6 +105,10 @@
 /* Define to header that first defines elf. */
 #undef LOCATION_OF_LIBELFHEADER
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
 /* number of unique file servers serving a logical file path that a cluster
    can see */
 #undef MAX_DEGREE_DISTRIBUTION
@@ -154,5 +158,5 @@
 #undef inline
 #endif
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

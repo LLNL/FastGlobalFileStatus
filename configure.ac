@@ -12,21 +12,21 @@ dnl         June 29 2011 DHA: File created.
 dnl                          
 
 AC_PREREQ(2.59)
-AC_INIT(FastGlobalFileStatus, 1.0, ahn1@llnl.gov)
+AC_INIT(FastGlobalFileStatus, 1.1, ahn1@llnl.gov)
 dnl Version numbers, remember to change them just *before* a release. 
 dnl (Interfaces removed: CURRENT++, AGE=0, REVISION=0)
 dnl (Interfaces added: CURRENT++, AGE++, REVISION=0)
 dnl (No interfaces changed: REVISION++) 
-FGFS_CURRENT=1
+FGFS_CURRENT=2
 FGFS_REVISION=0
-FGFS_AGE=0
+FGFS_AGE=1
 AC_SUBST(FGFS_CURRENT)
 AC_SUBST(FGFS_REVISION)
 AC_SUBST(FGFS_AGE)
 AC_CONFIG_AUX_DIR([config]) 
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE(FastGlobalFileStatus, 1.0)
+AM_INIT_AUTOMAKE(FastGlobalFileStatus, 1.1)
 AM_MAINTAINER_MODE([enable])
 AC_CANONICAL_HOST
 
