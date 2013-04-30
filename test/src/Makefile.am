@@ -132,8 +132,8 @@ async_stat_dso_mrnet_SOURCES   = async_stat_dso_mrnet.C \
                                  FgfsTestGetDsoList.C \
 				 FgfsMRNetWrapper.C
 async_stat_dso_mrnet_CXXFLAGS  = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) 
-async_stat_dso_mrnet_LDFLAGS   = -Wl,-E -L@MPALOC@/lib -L../../src $(MRNET_LDFLAGS)
-async_stat_dso_mrnet_LDADD     = -lelf -lssl @LIBMPA@ -lfgfs_mrnet
+async_stat_dso_mrnet_LDFLAGS   = -Wl,-E -L@MPALOC@/lib -L../../src $(MRNET_LDFLAGS) 
+async_stat_dso_mrnet_LDADD     = -lelf -lssl @LIBMPA@ -lfgfs_mrnet 
 
 
 do_subst = sed -e 's,@MRNETTOPGEN@,@MRNETTOPGENBIN@,g'

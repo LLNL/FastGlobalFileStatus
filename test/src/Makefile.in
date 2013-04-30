@@ -45,7 +45,12 @@ test_PROGRAMS = sync_stat_dso_mpi$(EXEEXT) async_stat_dso_mpi$(EXEEXT) \
 subdir = test/src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_enable_debug.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
+	$(top_srcdir)/config/ltoptions.m4 \
+	$(top_srcdir)/config/ltsugar.m4 \
+	$(top_srcdir)/config/ltversion.m4 \
+	$(top_srcdir)/config/lt~obsolete.m4 \
+	$(top_srcdir)/config/x_ac_enable_debug.m4 \
 	$(top_srcdir)/config/x_ac_max_dist_degree.m4 \
 	$(top_srcdir)/config/x_ac_mpa.m4 \
 	$(top_srcdir)/config/x_ac_mrnet.m4 \
@@ -424,8 +429,8 @@ async_stat_dso_mrnet_SOURCES = async_stat_dso_mrnet.C \
 				 FgfsMRNetWrapper.C
 
 async_stat_dso_mrnet_CXXFLAGS = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) 
-async_stat_dso_mrnet_LDFLAGS = -Wl,-E -L@MPALOC@/lib -L../../src $(MRNET_LDFLAGS)
-async_stat_dso_mrnet_LDADD = -lelf -lssl @LIBMPA@ -lfgfs_mrnet
+async_stat_dso_mrnet_LDFLAGS = -Wl,-E -L@MPALOC@/lib -L../../src $(MRNET_LDFLAGS) 
+async_stat_dso_mrnet_LDADD = -lelf -lssl @LIBMPA@ -lfgfs_mrnet 
 do_subst = sed -e 's,@MRNETTOPGEN@,@MRNETTOPGENBIN@,g'
 all: all-am
 

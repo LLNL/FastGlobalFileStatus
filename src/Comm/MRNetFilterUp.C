@@ -377,6 +377,11 @@ void FGFSFilterUp(std::vector<PacketPtr> &in,
                 }
 
                 pd.unpack((char*) buf, (size_t) bufSize);
+                //
+                // 4/30/2013 DHA: totalview memScape reports a leak 
+                // of buf, but it isn't clear if it is OK to free
+                // this at the client level. Leaving leaked for now. 
+                //
             }
 
             size_t packSize = pd.packedSize();
@@ -449,6 +454,11 @@ void FGFSFilterUp(std::vector<PacketPtr> &in,
                 ucharVector.push_back(value);
                 ucharVector[i] = value;
                 lenVector.push_back(valueLen);
+                //
+                // 4/30/2013 DHA: totalview memScape reports a leak 
+                // of unpack allocations, but it isn't clear if it is OK to free
+                // these at this client level. Leaving leaked for now. 
+                //
             }
 
             sendBuf = (unsigned char *)

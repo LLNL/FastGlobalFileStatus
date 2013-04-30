@@ -6,6 +6,7 @@
  *
  * Update Log:
  *
+ *        Apr 30 2013 DHA: Fix a memory leak in mapReduce 
  *        Jan 19 2011 DHA: File created.
  *
  */
@@ -231,6 +232,9 @@ MPICommFabric::mapReduce(bool global,
     }
 
     Reducer<MPICommFabric> *reducer = new BinomialReducer<MPICommFabric>;
+    if (!reducer) {
+      return false;
+    }
     reducer->reduce(0, pd, (MPICommFabric *) this);
 
     int bufSize;
@@ -241,6 +245,9 @@ MPICommFabric::mapReduce(bool global,
     MPI_Bcast(&bufSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     char *bbuf = (char *) malloc(bufSize);
+    if (!bbuf) {
+      return false;
+    }
     pd.pack(bbuf, bufSize);
 
     MPI_Bcast(bbuf, bufSize, MPI_CHAR, 0, MPI_COMM_WORLD);
@@ -248,6 +255,12 @@ MPICommFabric::mapReduce(bool global,
         pd.clearMap();
         pd.unpack(bbuf, bufSize);
     }
+
+    //
+    // 2013/04/30: DHA memcheck detected a leak 
+    //
+    delete reducer; 
+    free(bbuf);
 
     return true;
 }

@@ -5,6 +5,7 @@
  * All rights reserved.
  *
  * Update Log:
+ *        Apr 30 2013 DHA: Fix a memory leak
  *        Jul 01 2011 DHA: File created.
  *
  */
@@ -114,6 +115,14 @@ main(int argc, char *argv[])
 
     MPI_Bcast(&packedSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
     pathBuf = (char *) malloc(packedSize);
+    if (!pathBuf) {
+        MPA_sayMessage("TEST",
+                       true,
+                       "malloc returned null.");
+        MPI_Finalize();  
+        return EXIT_FAILURE;
+    }
+
     char *traverse = NULL;
     if (!rank) {
         traverse = pathBuf;
@@ -133,6 +142,7 @@ main(int argc, char *argv[])
         }
     }
 
+    free (pathBuf);
 
     //
     // Initialize the synchronous global file stat

@@ -1,7 +1,7 @@
 #!/bin/sh
 ## $Header: $
 ##
-## MPIScalingSetup.sh -- this is a script that sets up FGFS scaling tests for mpi.
+## MPIScalingSetup.sh -- this is a script that sets up FGFS scaling tests for MPI.
 ##    This creates experiment directories each of which contains a batch script
 ##    to run at various scales. The testers are async_stat_dso_mpi (AsyncGlobalFileStatus)
 ##    and sync_stat_dso_mpi (SyncGlobalFileStatus), which run FGFS' global 

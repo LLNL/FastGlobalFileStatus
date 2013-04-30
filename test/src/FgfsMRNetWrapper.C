@@ -242,6 +242,7 @@ setupDebugBE(Stream *strm, const char *daemonpath)
         goto ret_loc;
     }
 
+    free (buf);
     rc = 0;
 
 ret_loc:
@@ -304,6 +305,11 @@ MRNet_Init(MRNetCompKind mrnetComponent, int *argcPtr,
                                                     SFILTER_WAITFORALL,
                                                     downFilterId);
 
+        //
+        // 4/30/2013 DHA: memScape reports a leak of commBC but it is
+        // not clear if we are supposed to free this object at this
+        // client level.
+        //
         if ((*channelObjPtr)->send(MRNetHelloTag, "%d", MRNetHelloTag)) {
             MPA_sayMessage("TEST",
                            true,

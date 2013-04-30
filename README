@@ -77,6 +77,8 @@
      This package has been ported to both MPI and MRNet. To build the 
      complete package, you must have MRNet installed on your system. 
 
+     You can download a version of MRNet in http://www.paradyn.org/mrnet
+
    C. OpenSSL
 
      Fast Global File Status allows its user to define a function that

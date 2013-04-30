@@ -72,6 +72,10 @@ getDependentDSOs (const std::string &execPath, std::vector<std::string> &dlibs)
         return -1;
     }
 
+    //
+    // 2013/4/30 DHA: memcheck detects a memory leak as calling
+    // elf_end doesn't seem to free it. 
+    //
     if ( ( arf = elf_begin (fd, ELF_C_READ, NULL)) == NULL ) {
         MPA_sayMessage("FgfsTestGetDsoList",
                        true,

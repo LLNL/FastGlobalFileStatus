@@ -5,7 +5,7 @@
  * All rights reserved.
  *
  * Update Log:
- *
+ *        Apr 30 2013 DHA: Fix a memory leak in mapReduce 
  *        Jul  7 2011 DHA: File created. (Copied from the old MRNetCommFabric.C)
  *
  */
@@ -355,6 +355,14 @@ MRNetCommFabric::mapReduce(bool global, FgfsParDesc &pd,
     MRNetMsgType oPType = MMT_op_allreduce_map;
 
     unsigned char *bbuf = (unsigned char *) malloc(byteSendLen);
+    if (!bbuf) {
+        if (ChkVerbose(1)) {
+            MPA_sayMessage("MRNetCommFabric",
+                true,
+                "malloc returned null");
+        }
+        goto return_location;
+    }
     pd.pack((char *)bbuf, byteSendLen);
 
     if (mMrnetCompType == mck_frontEnd) {
@@ -401,6 +409,11 @@ MRNetCommFabric::mapReduce(bool global, FgfsParDesc &pd,
         pd.unpack((char*)tmpRecv, byteRecvLen);
         free(tmpRecv);
     }
+    
+    //
+    // 4/30/2013 DHA: totalview MemScape found a leak
+    //
+    free (bbuf);
 
 return_location:
     return mthRc;
