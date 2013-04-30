@@ -132,7 +132,51 @@
     % make install
 
 
-6. Testing (TDB)
+6. Testing
 
+    % cd share/FastGlobalFileStatus/tests
+
+    Test cases are installed into this directory. If you want to 
+    increase the verbosity level, use the MPA_TEST_ENABLE_VERBOSE
+    environment variable. E.g., 
+
+    % setenv MPA_TEST_ENABLE_VERBOSE 1 
+
+    The current test cases:
+    * MPIScalingSetup.sh: sets up scaling experiments for 
+        FGFS global file queries with MPI in ./FGFS.Scaling.MPI.
+        The generated scripts/batchscripts are for MOAB/SLURM environment.
+        We appreciate any effort to port these experiments to other grid 
+        software or resource manager software.See this script header
+        for more details.
+
+    * MRNetScalingSetup.sh: sets up scaling experiments for 
+        FGFS global file queries with MRNet in ./FGFS.Scaling.MRNet.
+        The generated scripts/batchscripts are for MOAB/SLURM environment.
+        We appreciate any effort to port these experiments to other grid 
+        software or resource manager software. See this script header
+        for more details.
+
+    * st_classifier_constmem_per_proc: tests FGFS global file systems 
+        status queries.Processes perform 4 file systems status queries 
+        with equal per-process storage requirements. (1MB, 1GB, 2GB, and 4GB).
+        This is configured with MPI and requires manual validation 
+        whether the returned match vector meets the requirement. 
+
+    * st_classifier_big_on_oneproc: tests FGFS global file systems 
+        status queries. Processes perform 6 file systems status queries 
+        with only one process asking for much larger amounts. All but
+        one process (MPI rank process 1) asks for 1MB. MPI rank 1
+        requests 4GB, 8GB, 16GB, 32GB, 1TB and 4TB.
+        This is configured with MPI and requires manual validation 
+        whether the returned match vector meets the requirement. 
+
+    * st_classifier_c_lang: tests calling from within C routines FGFS
+        global file systems status queries which are written in C++.
+        This is configured with MPI and requires manual validation 
+        whether the returned match vector meets the requirement. 
+
+    * st_mountpoint_classifier: prints out the classifier information 
+        on all of the mount points. This requires manual validation.
 
 7. Documents (TDB)
