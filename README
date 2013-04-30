@@ -1,6 +1,6 @@
 ## $Header: $
 ##
-## Makefile.am -- Process this file with automake to produce Makefile.in 
+## README
 ##
 ## -------------------------------------------------------------------------------- 
 ## Copyright (c) 2011 - 2013, Lawrence Livermore National Security, LLC. Produced at
@@ -89,9 +89,9 @@
 3. Compatibility
 
      Fast Global File Status v1.1
-	- MountPointAttributes (v1.1)
-        - MRNet (v3.1.0 and v4.0.0 w/ performance patch)
-	- OpenSSL (v1.0.0)
+       - MountPointAttributes (v1.1)
+       - MRNet (v3.1.0 and v4.0.0 w/ performance patch)
+       - OpenSSL (v1.0.0)
 
 
 4. Configuration 
