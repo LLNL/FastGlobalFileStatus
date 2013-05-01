@@ -109,7 +109,7 @@ namespace FastGlobalFileStatus {
          *   Class Static Initializer
          *
          *   @param[in] net opaque network object
-         *   @param[in] dedicatedChannel opaque channel object
+         *   @param[in] channel opaque channel object
          *
          *   @return a bool value
          */

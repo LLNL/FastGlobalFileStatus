@@ -50,22 +50,24 @@ namespace FastGlobalFileStatus {
         /**
          *   PtoP send
          *   @param[in] receiver receiver
+         *   @param[in] pd an FgfsStatDesc objec
          */
         void send(int receiver, FgfsParDesc &pd) const;
 
         /**
          *   PtoP receive
          *   @param[in] sender receiver
+         *   @param[in,out] pd an FgfsStatDesc objec
          */
         void receive(int sender, FgfsParDesc &pd);
 
         /**
          *   MPI-based Class Static Initializer
          *
-         *   @param[in|out] argc int* arguments count
-         *   @param[in|out] argv char*** argugments vector 
+         *   @param[in,out] argc int* arguments count
+         *   @param[in,out] argv char*** argugments vector 
          *   @param[in] net opaque network object
-         *   @param[in] dedicatedChannel opaque channel object
+         *   @param[in] channel opaque channel object
          *
          *   @return a bool value
          */
@@ -143,6 +145,7 @@ namespace FastGlobalFileStatus {
          *
          *   @param[out] rank pointer to an int
          *   @param[out] size pointer to an int
+         *   @param[out] glMaster is this rank the global master
          *
          *   @return a bool value
          */

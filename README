@@ -119,8 +119,8 @@
        the worst "remote-server" case (e.g., a set of NFS file servers serve
        a file to the processes), which is typically much smaller than the 
        the worse "local" case. For LLNL Linux clusters, we set this to 20, as 
-       the worst case is when 1 NFS server per scalable unit (156 16-way 
-       compute nodes) serve files to the processes.
+       the worst case is when one NFS server per scalable unit (SU: 156 16-way 
+       compute nodes) serves files to the processes.
 
        Note that if MPA is installed somewhere other than <your_install_path>, 
        you can use the optional --with-mpa=<mpa path>.
@@ -144,39 +144,57 @@
 
     The current test cases:
     * MPIScalingSetup.sh: sets up scaling experiments for 
-        FGFS global file queries with MPI in ./FGFS.Scaling.MPI.
+        FGFS global file status queries with MPI in ./FGFS.Scaling.MPI.
         The generated scripts/batchscripts are for MOAB/SLURM environment.
         We appreciate any effort to port these experiments to other grid 
-        software or resource manager software.See this script header
-        for more details.
+        software and/or resource manager software. See the header of 
+        this testing script for more details.
 
     * MRNetScalingSetup.sh: sets up scaling experiments for 
-        FGFS global file queries with MRNet in ./FGFS.Scaling.MRNet.
+        FGFS global file status queries with MRNet in ./FGFS.Scaling.MRNet.
         The generated scripts/batchscripts are for MOAB/SLURM environment.
         We appreciate any effort to port these experiments to other grid 
-        software or resource manager software. See this script header
-        for more details.
+        software and/or resource manager software. See the header of
+        this testing script for more details.
 
     * st_classifier_constmem_per_proc: tests FGFS global file systems 
-        status queries.Processes perform 4 file systems status queries 
-        with equal per-process storage requirements. (1MB, 1GB, 2GB, and 4GB).
-        This is configured with MPI and requires manual validation 
-        whether the returned match vector meets the requirement. 
+        status queries. Processes perform 4 separate file systems 
+        status queries with equal per-process storage requirements:
+        1MB, 1GB, 2GB, and 4GB. This test is configured with MPI 
+        and also requires manual validation whether the returned match 
+        vector meets the requirement. 
 
     * st_classifier_big_on_oneproc: tests FGFS global file systems 
-        status queries. Processes perform 6 file systems status queries 
-        with only one process asking for much larger amounts. All but
-        one process (MPI rank process 1) asks for 1MB. MPI rank 1
-        requests 4GB, 8GB, 16GB, 32GB, 1TB and 4TB.
-        This is configured with MPI and requires manual validation 
+        status queries. Processes perform 6 separate file systems 
+        status queries with only one process asking for much larger 
+        amounts. All but one process (MPI rank process 1) alwasy ask 
+        for 1MB whereas MPI rank 1 requests 4GB, 8GB, 16GB, 32GB, 
+        1TB and 4TB across these 6 queries. This test is configuted 
+        with MPI and also requires manual validation 
         whether the returned match vector meets the requirement. 
 
-    * st_classifier_c_lang: tests calling from within C routines FGFS
+    * st_classifier_c_lang: tests calling from within a C routine FGFS
         global file systems status queries which are written in C++.
-        This is configured with MPI and requires manual validation 
-        whether the returned match vector meets the requirement. 
+        This is configured with MPI and also requires manual validation 
+        whether the returned match vector meets the requirement.
 
     * st_mountpoint_classifier: prints out the classifier information 
         on all of the mount points. This requires manual validation.
 
-7. Documents (TDB)
+7. Documents 
+
+    To build the programming guide documents, assuming you have a recent
+    version of doxygen installed on your build system:
+
+    % cd doc
+    % doxygen doxy_conf.txt
+
+    Above commands will produce html directory. You can access
+    the main page by pointing html/index.html to your favorate
+    web browser.  In addition, man directory contains the same
+    information in the manpage format.  Further, if you want to build
+    a latex-based reference manual
+
+    % cd latex
+    % make
+

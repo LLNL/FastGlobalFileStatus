@@ -37,9 +37,6 @@ namespace FastGlobalFileStatus {
          *   GlobalStorageChecker Ctor
          *
          *   @param[in] pth an absolute path with no links to a file
-         *   @param[in] c CommFabric object
-         *   @param[in] net opaque network object
-         *   @param[out] dedicatedChannel opaque channle object
          *   @return none
          */
        GlobalStorageChecker(const char *pth);
@@ -51,9 +48,6 @@ namespace FastGlobalFileStatus {
          *   @param[in] threshold a process count to staturate the
          *                         file server; when you want to overwrite
          *                         the default threshold.
-         *   @param[in] c CommFabric object
-         *   @param[in] net opaque network object
-         *   @param[out] dedicatedChannel opaque channle object
          *   @return none
          */
         GlobalStorageChecker(const char *pth, const int threshold);
