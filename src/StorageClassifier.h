@@ -27,7 +27,7 @@ namespace FastGlobalFileStatus {
 
 
     /**
-     *   Defines a data type that inherits SynGlobalFileStatus
+     *   Defines a data type that inherits SyncGlobalFileStatus
      *   to help check space requirement for each mount-point-path.
      */
     class GlobalStorageChecker : public SyncGlobalFileStatus {
@@ -164,9 +164,7 @@ namespace FastGlobalFileStatus {
     /**
      *   Defines a data type that provides best file systems based
      *   on the criteria. The provideBestFileSystem method  and
-     *   provideMatchingFileSystem are the key abstractions. Note
-     *   that users of this class should instantiate an object
-     *   through a factory method.
+     *   provideMatchingFileSystem are the key abstractions. 
      *
      *   Only one type of constructor is allowed to be called;
      *   an object of this type cannot be copied or assigned.
