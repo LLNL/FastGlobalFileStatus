@@ -21,6 +21,7 @@ INCLUDES                       = -I$(top_srcdir) \
 testdir                        = ${pkgdatadir}/tests
 test_PROGRAMS                  = sync_stat_dso_mpi \
                                  async_stat_dso_mpi \
+                                 sync_stat_apath_mpi \
                                  st_classifier_constmem_per_proc \
                                  st_classifier_big_on_oneproc \
                                  st_classifier_c_lang \
@@ -62,6 +63,16 @@ async_stat_dso_mpi_SOURCES     = async_stat_dso_mpi.C \
 async_stat_dso_mpi_CXXFLAGS    = $(MPI_CFLAGS) $(AM_CXXFLAGS)
 async_stat_dso_mpi_LDFLAGS     = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
 async_stat_dso_mpi_LDADD       = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+
+
+#
+#  SYNC_STAT_APATH_MPI rules
+#
+sync_stat_apath_mpi_SOURCES      = sync_stat_apath_mpi.C \
+                                   FgfsTestGetDsoList.C
+sync_stat_apath_mpi_CXXFLAGS     = $(AM_CXXFLAGS) $(MPI_CFLAGS)
+sync_stat_apath_mpi_LDFLAGS      = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+sync_stat_apath_mpi_LDADD        = -lelf -lssl @LIBMPA@ -lfgfs_mpi
 
 
 #

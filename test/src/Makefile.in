@@ -36,6 +36,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 test_PROGRAMS = sync_stat_dso_mpi$(EXEEXT) async_stat_dso_mpi$(EXEEXT) \
+	sync_stat_apath_mpi$(EXEEXT) \
 	st_classifier_constmem_per_proc$(EXEEXT) \
 	st_classifier_big_on_oneproc$(EXEEXT) \
 	st_classifier_c_lang$(EXEEXT) \
@@ -135,6 +136,15 @@ st_mountpoint_classifier_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(st_mountpoint_classifier_CXXFLAGS) $(CXXFLAGS) \
 	$(st_mountpoint_classifier_LDFLAGS) $(LDFLAGS) -o $@
+am_sync_stat_apath_mpi_OBJECTS =  \
+	sync_stat_apath_mpi-sync_stat_apath_mpi.$(OBJEXT) \
+	sync_stat_apath_mpi-FgfsTestGetDsoList.$(OBJEXT)
+sync_stat_apath_mpi_OBJECTS = $(am_sync_stat_apath_mpi_OBJECTS)
+sync_stat_apath_mpi_DEPENDENCIES =
+sync_stat_apath_mpi_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) \
+	$(sync_stat_apath_mpi_LDFLAGS) $(LDFLAGS) -o $@
 am_sync_stat_dso_mpi_OBJECTS =  \
 	sync_stat_dso_mpi-sync_stat_dso_mpi.$(OBJEXT) \
 	sync_stat_dso_mpi-FgfsTestGetDsoList.$(OBJEXT)
@@ -186,7 +196,7 @@ SOURCES = $(async_stat_dso_mpi_SOURCES) \
 	$(st_classifier_c_lang_SOURCES) \
 	$(st_classifier_constmem_per_proc_SOURCES) \
 	$(st_mountpoint_classifier_SOURCES) \
-	$(sync_stat_dso_mpi_SOURCES)
+	$(sync_stat_apath_mpi_SOURCES) $(sync_stat_dso_mpi_SOURCES)
 DIST_SOURCES = $(async_stat_dso_mpi_SOURCES) \
 	$(async_stat_dso_mrnet_SOURCES) $(gen_hostlist_SOURCES) \
 	$(mrnet_node_req_SOURCES) $(my_topo_gen_SOURCES) \
@@ -194,7 +204,7 @@ DIST_SOURCES = $(async_stat_dso_mpi_SOURCES) \
 	$(st_classifier_c_lang_SOURCES) \
 	$(st_classifier_constmem_per_proc_SOURCES) \
 	$(st_mountpoint_classifier_SOURCES) \
-	$(sync_stat_dso_mpi_SOURCES)
+	$(sync_stat_apath_mpi_SOURCES) $(sync_stat_dso_mpi_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -367,6 +377,16 @@ async_stat_dso_mpi_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
 async_stat_dso_mpi_LDADD = -lelf -lssl @LIBMPA@ -lfgfs_mpi
 
 #
+#  SYNC_STAT_APATH_MPI rules
+#
+sync_stat_apath_mpi_SOURCES = sync_stat_apath_mpi.C \
+                                   FgfsTestGetDsoList.C
+
+sync_stat_apath_mpi_CXXFLAGS = $(AM_CXXFLAGS) $(MPI_CFLAGS)
+sync_stat_apath_mpi_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+sync_stat_apath_mpi_LDADD = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+
+#
 #  ST_CLASSIFIER_CONSTMEM_PER_PROC  rules
 #
 st_classifier_constmem_per_proc_SOURCES = st_classifier_constmem_per_proc.C
@@ -536,6 +556,9 @@ st_classifier_constmem_per_proc$(EXEEXT): $(st_classifier_constmem_per_proc_OBJE
 st_mountpoint_classifier$(EXEEXT): $(st_mountpoint_classifier_OBJECTS) $(st_mountpoint_classifier_DEPENDENCIES) 
 	@rm -f st_mountpoint_classifier$(EXEEXT)
 	$(st_mountpoint_classifier_LINK) $(st_mountpoint_classifier_OBJECTS) $(st_mountpoint_classifier_LDADD) $(LIBS)
+sync_stat_apath_mpi$(EXEEXT): $(sync_stat_apath_mpi_OBJECTS) $(sync_stat_apath_mpi_DEPENDENCIES) 
+	@rm -f sync_stat_apath_mpi$(EXEEXT)
+	$(sync_stat_apath_mpi_LINK) $(sync_stat_apath_mpi_OBJECTS) $(sync_stat_apath_mpi_LDADD) $(LIBS)
 sync_stat_dso_mpi$(EXEEXT): $(sync_stat_dso_mpi_OBJECTS) $(sync_stat_dso_mpi_DEPENDENCIES) 
 	@rm -f sync_stat_dso_mpi$(EXEEXT)
 	$(sync_stat_dso_mpi_LINK) $(sync_stat_dso_mpi_OBJECTS) $(sync_stat_dso_mpi_LDADD) $(LIBS)
@@ -593,6 +616,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st_classifier_c_lang-st_classifier_c_lang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st_classifier_constmem_per_proc-st_classifier_constmem_per_proc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st_mountpoint_classifier-st_mountpoint_classifier.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sync_stat_apath_mpi-FgfsTestGetDsoList.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sync_stat_apath_mpi-sync_stat_apath_mpi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sync_stat_dso_mpi-FgfsTestGetDsoList.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sync_stat_dso_mpi-sync_stat_dso_mpi.Po@am__quote@
 
@@ -798,6 +823,34 @@ st_mountpoint_classifier-st_mountpoint_classifier.obj: st_mountpoint_classifier.
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='st_mountpoint_classifier.C' object='st_mountpoint_classifier-st_mountpoint_classifier.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(st_mountpoint_classifier_CXXFLAGS) $(CXXFLAGS) -c -o st_mountpoint_classifier-st_mountpoint_classifier.obj `if test -f 'st_mountpoint_classifier.C'; then $(CYGPATH_W) 'st_mountpoint_classifier.C'; else $(CYGPATH_W) '$(srcdir)/st_mountpoint_classifier.C'; fi`
+
+sync_stat_apath_mpi-sync_stat_apath_mpi.o: sync_stat_apath_mpi.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) -MT sync_stat_apath_mpi-sync_stat_apath_mpi.o -MD -MP -MF $(DEPDIR)/sync_stat_apath_mpi-sync_stat_apath_mpi.Tpo -c -o sync_stat_apath_mpi-sync_stat_apath_mpi.o `test -f 'sync_stat_apath_mpi.C' || echo '$(srcdir)/'`sync_stat_apath_mpi.C
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/sync_stat_apath_mpi-sync_stat_apath_mpi.Tpo $(DEPDIR)/sync_stat_apath_mpi-sync_stat_apath_mpi.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sync_stat_apath_mpi.C' object='sync_stat_apath_mpi-sync_stat_apath_mpi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) -c -o sync_stat_apath_mpi-sync_stat_apath_mpi.o `test -f 'sync_stat_apath_mpi.C' || echo '$(srcdir)/'`sync_stat_apath_mpi.C
+
+sync_stat_apath_mpi-sync_stat_apath_mpi.obj: sync_stat_apath_mpi.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) -MT sync_stat_apath_mpi-sync_stat_apath_mpi.obj -MD -MP -MF $(DEPDIR)/sync_stat_apath_mpi-sync_stat_apath_mpi.Tpo -c -o sync_stat_apath_mpi-sync_stat_apath_mpi.obj `if test -f 'sync_stat_apath_mpi.C'; then $(CYGPATH_W) 'sync_stat_apath_mpi.C'; else $(CYGPATH_W) '$(srcdir)/sync_stat_apath_mpi.C'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/sync_stat_apath_mpi-sync_stat_apath_mpi.Tpo $(DEPDIR)/sync_stat_apath_mpi-sync_stat_apath_mpi.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sync_stat_apath_mpi.C' object='sync_stat_apath_mpi-sync_stat_apath_mpi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) -c -o sync_stat_apath_mpi-sync_stat_apath_mpi.obj `if test -f 'sync_stat_apath_mpi.C'; then $(CYGPATH_W) 'sync_stat_apath_mpi.C'; else $(CYGPATH_W) '$(srcdir)/sync_stat_apath_mpi.C'; fi`
+
+sync_stat_apath_mpi-FgfsTestGetDsoList.o: FgfsTestGetDsoList.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) -MT sync_stat_apath_mpi-FgfsTestGetDsoList.o -MD -MP -MF $(DEPDIR)/sync_stat_apath_mpi-FgfsTestGetDsoList.Tpo -c -o sync_stat_apath_mpi-FgfsTestGetDsoList.o `test -f 'FgfsTestGetDsoList.C' || echo '$(srcdir)/'`FgfsTestGetDsoList.C
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/sync_stat_apath_mpi-FgfsTestGetDsoList.Tpo $(DEPDIR)/sync_stat_apath_mpi-FgfsTestGetDsoList.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FgfsTestGetDsoList.C' object='sync_stat_apath_mpi-FgfsTestGetDsoList.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) -c -o sync_stat_apath_mpi-FgfsTestGetDsoList.o `test -f 'FgfsTestGetDsoList.C' || echo '$(srcdir)/'`FgfsTestGetDsoList.C
+
+sync_stat_apath_mpi-FgfsTestGetDsoList.obj: FgfsTestGetDsoList.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) -MT sync_stat_apath_mpi-FgfsTestGetDsoList.obj -MD -MP -MF $(DEPDIR)/sync_stat_apath_mpi-FgfsTestGetDsoList.Tpo -c -o sync_stat_apath_mpi-FgfsTestGetDsoList.obj `if test -f 'FgfsTestGetDsoList.C'; then $(CYGPATH_W) 'FgfsTestGetDsoList.C'; else $(CYGPATH_W) '$(srcdir)/FgfsTestGetDsoList.C'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/sync_stat_apath_mpi-FgfsTestGetDsoList.Tpo $(DEPDIR)/sync_stat_apath_mpi-FgfsTestGetDsoList.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='FgfsTestGetDsoList.C' object='sync_stat_apath_mpi-FgfsTestGetDsoList.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_apath_mpi_CXXFLAGS) $(CXXFLAGS) -c -o sync_stat_apath_mpi-FgfsTestGetDsoList.obj `if test -f 'FgfsTestGetDsoList.C'; then $(CYGPATH_W) 'FgfsTestGetDsoList.C'; else $(CYGPATH_W) '$(srcdir)/FgfsTestGetDsoList.C'; fi`
 
 sync_stat_dso_mpi-sync_stat_dso_mpi.o: sync_stat_dso_mpi.C
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sync_stat_dso_mpi_CXXFLAGS) $(CXXFLAGS) -MT sync_stat_dso_mpi-sync_stat_dso_mpi.o -MD -MP -MF $(DEPDIR)/sync_stat_dso_mpi-sync_stat_dso_mpi.Tpo -c -o sync_stat_dso_mpi-sync_stat_dso_mpi.o `test -f 'sync_stat_dso_mpi.C' || echo '$(srcdir)/'`sync_stat_dso_mpi.C
