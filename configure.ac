@@ -90,7 +90,7 @@ AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([map vector iostream string sstream stdexcept])
 AC_LANG_POP([C++])
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h limits.h stdint.h stdlib.h string.h unistd.h stdarg.h math.h string.h sys/mman.h sys/vfs.h sys/stat.h openssl/md5.h libelf.h libelf/libelf.h])
+AC_CHECK_HEADERS([fcntl.h limits.h stdint.h stdlib.h string.h unistd.h stdarg.h math.h string.h sys/mman.h sys/vfs.h sys/stat.h openssl/md5.h libelf.h libelf/libelf.h arpa/inet.h])
 
 if test "$ac_cv_header_libelf_h" = "yes" ; then
      AC_DEFINE(LOCATION_OF_LIBELFHEADER, [<libelf.h>],

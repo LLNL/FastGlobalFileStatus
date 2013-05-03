@@ -237,6 +237,16 @@ MPICommFabric::mapReduce(bool global,
     }
     reducer->reduce(0, pd, (MPICommFabric *) this);
 
+    if (IS_YES(pd.isGlobalMaster())) {
+        if (pd.eliminateUriAlias()) {
+	  //if (ChkVerbose(1)) {
+                MPA_sayMessage("MPICommFabric",
+                    false,
+                    "Uri Alias eliminated");
+	  // }
+	}
+    }
+
     int bufSize;
     if (pd.getRank() == 0) {
         bufSize = (int) pd.packedSize();

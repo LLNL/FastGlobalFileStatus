@@ -211,6 +211,14 @@ namespace FastGlobalFileStatus {
         FGFSInfoAnswer clearMap();
         std::map<std::string, ReduceDesc>& getGroupingMap();
 
+	
+        /**
+         *   Eliminates the aliases of file sources in groupingMap
+	 *   and condence. Only the global master should call this
+	 *   method.
+         */
+	bool eliminateUriAlias();
+
 
         /**
          *   set group information based on the current state of

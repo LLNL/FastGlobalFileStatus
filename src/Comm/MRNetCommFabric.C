@@ -947,9 +947,18 @@ MRNetCommFabric::reduceFinal(unsigned char *finalBuf,
         case MMT_op_allreduce_map: {
 
             FgfsParDesc pd;
+	    pd.setGlobalMaster();
 
             pd.unpack((char*) finalBuf, (size_t) finalBufLen);
             pd.unpack((char*) mergedBuf, (size_t) mergedBufLen);
+
+            if (IS_YES(pd.isGlobalMaster())) {
+	        if (pd.eliminateUriAlias()) {	      
+	            MPA_sayMessage("MRNetCommFabric",
+		   	           false,
+			           "Uri Alias eliminated");
+	        }
+            }
 
             (*retLen) = (int) pd.packedSize();
             (*retBuf) = (unsigned char *) malloc(*retLen);

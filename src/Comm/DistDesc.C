@@ -10,12 +10,14 @@
  *
  */
 
-#include "DistDesc.h"
 #include <string.h>
+#include <arpa/inet.h>
+#include "DistDesc.h"
+#include "MountPointAttr.h"
 
 using namespace FastGlobalFileStatus;
 using namespace FastGlobalFileStatus::CommLayer;
-
+using namespace FastGlobalFileStatus::MountPointAttribute;
 
 ///////////////////////////////////////////////////////////////////
 //
@@ -431,6 +433,89 @@ FgfsParDesc::clearMap()
     }
 
     return answer;
+}
+
+
+bool 
+FgfsParDesc::eliminateUriAlias()
+{
+    //
+    // This currently only deals w/ a special case where only two
+    // names are used for the hostname of a file source
+    //
+
+    if (!mGlobalMaster) {
+        MPA_sayMessage("FgfsParDesc",
+		       false,
+		       "Slave invoked a master-only method...");
+        return false;
+    }
+
+    if (groupingMap.size() != 2) {
+
+        return false;
+    }
+
+    bool rc = false;
+    in_addr_t srcAddr1 = 0;
+    in_addr_t srcAddr2 = 0;
+    bool isSymbolic1 = false;
+    bool isSymbolic2 = false;
+    unsigned delim; 
+
+    std::map<std::string, ReduceDesc>::iterator iter;
+
+    iter = groupingMap.begin();
+    delim = iter->first.find_first_of("//");  
+    if (delim != std::string::npos) {      
+        std::string str1 
+	  = iter->first.substr(delim+2);
+	delim = str1.find_first_of("/");
+	if (delim != std::string::npos) {
+	    std::string srcName = str1.substr(0, delim);
+	    if (srcName[0] >= 'A' && srcName[srcName.size()-1] >= 'A') {
+	        isSymbolic1 = true;
+	    }
+	    srcAddr1 = inet_addr(srcName.c_str());		  
+	}
+    }
+  
+    iter++;
+    delim = iter->first.find_first_of("//");    
+    if (delim != std::string::npos) {      
+        std::string str1 
+	  = iter->first.substr(delim+2);
+	delim = str1.find_first_of("/");
+	if (delim != std::string::npos) {
+	    std::string srcName = str1.substr(0, delim);
+	    if (srcName[0] >= 'A' && srcName[srcName.size()-1] >= 'A') {
+	        isSymbolic2 = true;
+	    }
+	    srcAddr2 = inet_addr(srcName.c_str());
+	}
+    }
+    
+    if ( (!srcAddr1 && !srcAddr2) 
+	 && (srcAddr1 == srcAddr2)) {
+      //
+      // Alias detected
+      //
+      iter = groupingMap.begin();
+      iter++;
+      if (isSymbolic1) {
+	iter->second.incrCountBy(
+	    groupingMap.begin()->second.getCount());
+	groupingMap.erase(groupingMap.begin());
+      }
+      else {
+	groupingMap.begin()->second.incrCountBy(
+            iter->second.getCount());
+	groupingMap.erase(iter);	
+      }
+      rc = true;
+    }
+
+    return rc;
 }
 
 

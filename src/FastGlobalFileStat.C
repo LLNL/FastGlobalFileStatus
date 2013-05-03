@@ -581,3 +581,4 @@ GlobalFileStatusBase::plain_parallelInfo(GlobalFileStatusAPI *gfsObj)
 
     return rc;
 }
+
