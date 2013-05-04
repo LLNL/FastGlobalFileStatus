@@ -954,9 +954,11 @@ MRNetCommFabric::reduceFinal(unsigned char *finalBuf,
 
             if (IS_YES(pd.isGlobalMaster())) {
 	        if (pd.eliminateUriAlias()) {	      
-	            MPA_sayMessage("MRNetCommFabric",
+                    if (ChkVerbose(1)) {
+	                MPA_sayMessage("MRNetCommFabric",
 		   	           false,
 			           "Uri Alias eliminated");
+                    }
 	        }
             }
 

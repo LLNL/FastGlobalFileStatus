@@ -17660,7 +17660,10 @@ fi
 
 
 
-for ac_header in fcntl.h limits.h stdint.h stdlib.h string.h unistd.h stdarg.h math.h string.h sys/mman.h sys/vfs.h sys/stat.h openssl/md5.h libelf.h libelf/libelf.h arpa/inet.h
+
+
+
+for ac_header in fcntl.h limits.h stdint.h stdlib.h string.h unistd.h stdarg.h math.h string.h sys/mman.h sys/vfs.h sys/stat.h openssl/md5.h libelf.h libelf/libelf.h arpa/inet.h sys/types.h sys/sockets.h netdb.h
 do
 as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then

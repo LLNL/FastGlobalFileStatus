@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
     if (argc < 5) {
         MPA_sayMessage("TEST", true, 
-            "Usage: abs_test_path test_type abs_target_path FE|BE topo_file");
+            "Usage: async_stat_dso_mrnet test_type abs_target_path FE|BE topo_file");
         MPA_sayMessage("TEST", true, "    test_type: 0 check if isUnique");
         MPA_sayMessage("TEST", true, "    test_type: 1 check if isPoorlyDistributed");
         MPA_sayMessage("TEST", true, "    test_type: 2 check if isWellDistributed");

@@ -11,6 +11,9 @@
  */
 
 #include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include <arpa/inet.h>
 #include "DistDesc.h"
 #include "MountPointAttr.h"
@@ -443,7 +446,7 @@ FgfsParDesc::eliminateUriAlias()
     // This currently only deals w/ a special case where only two
     // names are used for the hostname of a file source
     //
-
+    
     if (!mGlobalMaster) {
         MPA_sayMessage("FgfsParDesc",
 		       false,
@@ -451,14 +454,15 @@ FgfsParDesc::eliminateUriAlias()
         return false;
     }
 
+
     if (groupingMap.size() != 2) {
 
         return false;
     }
 
     bool rc = false;
-    in_addr_t srcAddr1 = 0;
-    in_addr_t srcAddr2 = 0;
+    unsigned long srcAddr1 = -1;
+    unsigned long srcAddr2 = -1;
     bool isSymbolic1 = false;
     bool isSymbolic2 = false;
     unsigned delim; 
@@ -476,7 +480,15 @@ FgfsParDesc::eliminateUriAlias()
 	    if (srcName[0] >= 'A' && srcName[srcName.size()-1] >= 'A') {
 	        isSymbolic1 = true;
 	    }
-	    srcAddr1 = inet_addr(srcName.c_str());		  
+
+            struct addrinfo *ai; // = (struct addrinfo *) malloc(sizeof(struct addrinfo));
+            getaddrinfo(srcName.c_str(), NULL, NULL, &ai);
+            if (ai->ai_addr->sa_family == AF_INET) {
+                struct sockaddr_in *in = (struct sockaddr_in *) ai->ai_addr;
+                srcAddr1 = in->sin_addr.s_addr; 
+                //fprintf(stdout, "%s... %x\n", srcName.c_str(), srcAddr1);
+                freeaddrinfo(ai); 
+            }
 	}
     }
   
@@ -491,11 +503,18 @@ FgfsParDesc::eliminateUriAlias()
 	    if (srcName[0] >= 'A' && srcName[srcName.size()-1] >= 'A') {
 	        isSymbolic2 = true;
 	    }
-	    srcAddr2 = inet_addr(srcName.c_str());
+            struct addrinfo *ai; // = (struct addrinfo *) malloc(sizeof(struct addrinfo));
+            getaddrinfo(srcName.c_str(), NULL, NULL, &ai);
+            if (ai->ai_addr->sa_family == AF_INET) {
+                struct sockaddr_in *in = (struct sockaddr_in *) ai->ai_addr;
+                srcAddr2 = in->sin_addr.s_addr; 
+                //fprintf(stdout, "%s... %x\n", srcName.c_str(), srcAddr2);
+                freeaddrinfo(ai); 
+            }
 	}
     }
     
-    if ( (!srcAddr1 && !srcAddr2) 
+    if ( (srcAddr1 != -1 && !srcAddr2 != -1) 
 	 && (srcAddr1 == srcAddr2)) {
       //
       // Alias detected
