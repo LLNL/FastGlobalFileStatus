@@ -81,6 +81,7 @@ namespace FastGlobalFileStatus {
         MMT_op_allreduce_long_long_sum,
         MMT_op_allreduce_char_bor,
         MMT_op_allreduce_map,
+        MMT_op_allreduce_map_elim_alias,
         MMT_debug_mpir,
         MMT_place_holder
     };
@@ -157,12 +158,14 @@ namespace FastGlobalFileStatus {
          *   @param[in] global bool indicating global vs. group
          *   @param[out] pd an FgfsStatDesc object
          *   @param[in] item data item to group
+         *   @param[in] elimAlias flag that forces uri alias elimination
          *
          *   @return a bool value
          */
         virtual bool grouping(bool global,
                               FgfsParDesc &pd,
-                              std::string &item) const;
+                              std::string &item,
+                              bool elimAlias) const;
 
 
         /**
@@ -171,12 +174,14 @@ namespace FastGlobalFileStatus {
          *   @param[in] global bool indicating global vs. group
          *   @param[out] pd an FgfsStatDesc object
          *   @param[in] itemList a item list containing unique item (vector type)
+         *   @param[in] elimAlias flag that forces uri alias elimination
          *
          *   @return a bool value
          */
         virtual bool mapReduce(bool global,
                                FgfsParDesc &pd,
-                               std::vector<std::string> &itemList) const;
+                               std::vector<std::string> &itemList,
+                               bool elimAlias) const;
 
 
         /**

@@ -218,6 +218,7 @@ namespace FastGlobalFileStatus {
 	 *   method.
          */
 	bool eliminateUriAlias();
+        bool adjustUri();
 
 
         /**

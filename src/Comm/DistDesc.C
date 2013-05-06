@@ -522,18 +522,33 @@ FgfsParDesc::eliminateUriAlias()
       iter = groupingMap.begin();
       iter++;
       if (isSymbolic1) {
-	iter->second.incrCountBy(
-	    groupingMap.begin()->second.getCount());
-	groupingMap.erase(groupingMap.begin());
+	  iter->second.incrCountBy(
+	      groupingMap.begin()->second.getCount());
+	  groupingMap.erase(groupingMap.begin());
       }
       else {
-	groupingMap.begin()->second.incrCountBy(
-            iter->second.getCount());
-	groupingMap.erase(iter);	
+	  groupingMap.begin()->second.incrCountBy(
+              iter->second.getCount());
+	  groupingMap.erase(iter);	
       }
+
       rc = true;
     }
 
+    return rc;
+}
+
+
+bool 
+FgfsParDesc::adjustUri()
+{
+    bool rc = false;
+    if (groupingMap.find(mUriString) == groupingMap.end()) {
+        if (groupingMap.size() == 1) {
+            mUriString = groupingMap.begin()->first;
+            rc = true;
+        }
+    }
     return rc;
 }
 

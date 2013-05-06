@@ -185,7 +185,10 @@ MPICommFabric::broadcast(bool global, FgfsParDesc &pd,
 
 
 bool
-MPICommFabric::grouping(bool global, FgfsParDesc &pd, std::string &item) const
+MPICommFabric::grouping(bool global, 
+                        FgfsParDesc &pd, 
+                        std::string &item,
+                        bool elimAlias) const
 {
     if (!global) {
         if (ChkVerbose(1)) {
@@ -209,7 +212,10 @@ MPICommFabric::grouping(bool global, FgfsParDesc &pd, std::string &item) const
     std::vector<std::string> itemList;
     itemList.push_back(item);
 
-    mapReduce(global, pd, itemList);
+    //
+    // mapReduce may reset uriString of the pd object.
+    //
+    mapReduce(global, pd, itemList, elimAlias);
 
     pd.setGroupInfo();
 
@@ -220,7 +226,8 @@ MPICommFabric::grouping(bool global, FgfsParDesc &pd, std::string &item) const
 bool
 MPICommFabric::mapReduce(bool global,
                          FgfsParDesc &pd,
-                         std::vector<std::string> &itemList) const
+                         std::vector<std::string> &itemList,
+                         bool elimAlias) const
 {
     std::vector<std::string>::iterator i;
 
@@ -237,15 +244,35 @@ MPICommFabric::mapReduce(bool global,
     }
     reducer->reduce(0, pd, (MPICommFabric *) this);
 
-    if (IS_YES(pd.isGlobalMaster())) {
+    //
+    // When this is the global master and alias elimination is
+    // wanted, 
+    //
+    if (IS_YES(pd.isGlobalMaster()) && elimAlias) {
         if (pd.eliminateUriAlias()) {
-	  //if (ChkVerbose(1)) {
+	    if (ChkVerbose(1)) {
                 MPA_sayMessage("MPICommFabric",
                     false,
                     "Uri Alias eliminated");
-	  // }
+	    }
 	}
     }
+
+    //
+    // When your URI isn't there as a result of the elimniation,
+    // you should adjust your URI as well. If not adjusted, 
+    // grouping information will become bogus.
+    //
+    if (elimAlias) {
+        if (pd.adjustUri()) {
+            if (ChkVerbose(1)) {
+                MPA_sayMessage("MRNetCommFabric",
+                    false,
+                    "URI adjusted");
+                }
+        }
+    }
+
 
     int bufSize;
     if (pd.getRank() == 0) {

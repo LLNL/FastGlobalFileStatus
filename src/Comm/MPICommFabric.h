@@ -118,12 +118,14 @@ namespace FastGlobalFileStatus {
          *   @param[in] global bool indicating global vs. group
          *   @param[out] pd an FgfsStatDesc object
          *   @param[in] item data item to group
+         *   @param[in] elimAlias flag that forces elimination of uri aliases 
          *
          *   @return a bool value
          */
         virtual bool grouping(bool global,
                               FgfsParDesc &pd,
-                              std::string &item) const;
+                              std::string &item,
+                              bool elimAlias) const;
 
 
         /**
@@ -132,12 +134,14 @@ namespace FastGlobalFileStatus {
          *   @param[in] global bool indicating global vs. group
          *   @param[out] pd an FgfsStatDesc object
          *   @param[in] itemList a item list containing unique item (vector type)
+         *   @param[in] elimAlias flag that forces elimination of uri aliases 
          *
          *   @return a bool value
          */
         virtual bool mapReduce(bool global,
                                FgfsParDesc &pd,
-                               std::vector<std::string> &itemList) const;
+                               std::vector<std::string> &itemList,
+                               bool elimAlias) const;
 
 
         /**

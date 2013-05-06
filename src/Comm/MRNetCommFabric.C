@@ -290,8 +290,10 @@ return_location:
 
 
 bool
-MRNetCommFabric::grouping(bool global, FgfsParDesc &pd,
-                          std::string &item) const
+MRNetCommFabric::grouping(bool global, 
+                          FgfsParDesc &pd,
+                          std::string &item,
+                          bool elimAlias) const
 {
     if (!global) {
         if (ChkVerbose(1)) {
@@ -315,7 +317,10 @@ MRNetCommFabric::grouping(bool global, FgfsParDesc &pd,
     std::vector<std::string> itemList;
     itemList.push_back(item);
 
-    mapReduce(global, pd, itemList);
+    //
+    // mapReduce may reset uriString of the pd object.
+    //
+    mapReduce(global, pd, itemList, elimAlias);
 
     pd.setGroupInfo();
 
@@ -324,8 +329,10 @@ MRNetCommFabric::grouping(bool global, FgfsParDesc &pd,
 
 
 bool
-MRNetCommFabric::mapReduce(bool global, FgfsParDesc &pd,
-                     std::vector<std::string> &itemList) const
+MRNetCommFabric::mapReduce(bool global, 
+                           FgfsParDesc &pd,
+                           std::vector<std::string> &itemList,
+                           bool elimAlias) const
 {
     if (!global) {
         if (ChkVerbose(1)) {
@@ -352,7 +359,8 @@ MRNetCommFabric::mapReduce(bool global, FgfsParDesc &pd,
     unsigned int byteSendLen = (unsigned int) pd.packedSize();
     unsigned int byteRecvLen = byteSendLen;
 
-    MRNetMsgType oPType = MMT_op_allreduce_map;
+    MRNetMsgType oPType = (elimAlias)? MMT_op_allreduce_map_elim_alias
+                                       : MMT_op_allreduce_map;
 
     unsigned char *bbuf = (unsigned char *) malloc(byteSendLen);
     if (!bbuf) {
@@ -385,6 +393,15 @@ MRNetCommFabric::mapReduce(bool global, FgfsParDesc &pd,
 
         pd.clearMap();
         pd.unpack((char *)tmpRecv, byteRecvLen);
+        if (elimAlias) {
+            if (pd.adjustUri()) {
+                if (ChkVerbose(1)) {
+                    MPA_sayMessage("MRNetCommFabric",
+                        false,
+                        "URI adjusted");
+                }
+            }
+        }
         free(tmpRecv);
     }
     else if (mMrnetCompType == mck_backEnd) {
@@ -407,6 +424,15 @@ MRNetCommFabric::mapReduce(bool global, FgfsParDesc &pd,
 
         pd.clearMap();
         pd.unpack((char*)tmpRecv, byteRecvLen);
+        if (elimAlias) {
+            if (pd.adjustUri()) {
+                if (ChkVerbose(1)) {
+                    MPA_sayMessage("MRNetCommFabric",
+                        false,
+                        "URI adjusted");
+                }
+            }
+        }
         free(tmpRecv);
     }
     
@@ -944,7 +970,8 @@ MRNetCommFabric::reduceFinal(unsigned char *finalBuf,
             break;
         }
 
-        case MMT_op_allreduce_map: {
+        case MMT_op_allreduce_map: 
+        case MMT_op_allreduce_map_elim_alias: {
 
             FgfsParDesc pd;
 	    pd.setGlobalMaster();
@@ -952,14 +979,16 @@ MRNetCommFabric::reduceFinal(unsigned char *finalBuf,
             pd.unpack((char*) finalBuf, (size_t) finalBufLen);
             pd.unpack((char*) mergedBuf, (size_t) mergedBufLen);
 
-            if (IS_YES(pd.isGlobalMaster())) {
-	        if (pd.eliminateUriAlias()) {	      
-                    if (ChkVerbose(1)) {
-	                MPA_sayMessage("MRNetCommFabric",
-		   	           false,
-			           "Uri Alias eliminated");
-                    }
-	        }
+            if (oPType == MMT_op_allreduce_map_elim_alias) {
+	        if (IS_YES(pd.isGlobalMaster())) {
+		    if (pd.eliminateUriAlias()) {
+		        if (ChkVerbose(1)) {
+		            MPA_sayMessage("MRNetCommFabric",
+			  	       false,
+				       "Uri Alias eliminated");
+		        }
+		    }
+		}
             }
 
             (*retLen) = (int) pd.packedSize();

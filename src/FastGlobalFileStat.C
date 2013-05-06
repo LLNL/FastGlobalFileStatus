@@ -576,7 +576,10 @@ GlobalFileStatusBase::plain_parallelInfo(GlobalFileStatusAPI *gfsObj)
         rc = false;
     }
     else {
-        rc = mCommFabric->grouping(true, gfsObj->getParallelInfo(), uri);
+        rc = mCommFabric->grouping(true, 
+                 gfsObj->getParallelInfo(), 
+                 uri,
+                 true /* eliminate alias */);
     }
 
     return rc;

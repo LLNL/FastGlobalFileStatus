@@ -310,9 +310,11 @@ MountPointsClassifier::runClassification(CommLayer::CommFabric *c)
     //
     // mPointList contains logical mount point paths
     // Once mapReduce is done, parDesc.groupingMap contains.
-    // 'logical path': {first rank, count}
+    // 'logical path': {first rank, count}. Note the last
+    // boolean being passed here to indicate not to eliminate
+    // URI. This isn't an URI form.
     //
-    if ( (rc = getCommFabric()->mapReduce(true, parDesc, mPointList)) ) {
+    if ( (rc = getCommFabric()->mapReduce(true, parDesc, mPointList, false)) ) {
         //GlobalProperties gp;
         std::map<std::string, ReduceDesc> &gmap = parDesc.getGroupingMap();
         std::map<std::string, ReduceDesc>::const_iterator mapIter;

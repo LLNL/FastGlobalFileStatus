@@ -353,7 +353,8 @@ void FGFSFilterUp(std::vector<PacketPtr> &in,
             break;
         }
 
-        case MMT_op_allreduce_map: {
+        case MMT_op_allreduce_map: 
+        case MMT_op_allreduce_map_elim_alias: {
 
             FgfsParDesc pd;
 
