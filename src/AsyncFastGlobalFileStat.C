@@ -83,6 +83,35 @@ AsyncGlobalFileStatus::initialize(CommLayer::CommFabric *c)
 }
 
 
+bool 
+AsyncGlobalFileStatus::printMpClassifier()
+{
+    std::map<std::string, GlobalProperties>::const_iterator i;
+    for (i = mMpClassifier.mAnnoteMountPoints.begin(); 
+	 i !=mMpClassifier.mAnnoteMountPoints.end(); ++i) {
+        MPA_sayMessage("AsyncGlobalFileStatus",
+		       false,
+		       "PATH: %s", i->first.c_str());
+        MPA_sayMessage("AsyncGlobalFileStatus",
+		       false,
+		       "URI: %s", i->second.getParallelDescriptor().getUriString().c_str());
+	MPA_sayMessage("AsyncGlobalFileStatus",
+		       false,
+		       "Grouping: Rank(%d) numGroups(%d) groupId(%d) Size(%d) GlobalMaster(%d) ",
+		       i->second.getParallelDescriptor().getRank(),
+		       i->second.getParallelDescriptor().getNumOfGroups(),
+		       i->second.getParallelDescriptor().getGroupId(),
+		       i->second.getParallelDescriptor().getSize(),
+		       IS_YES(i->second.getParallelDescriptor().isGlobalMaster()));
+	MPA_sayMessage("AsyncGlobalFileStatus",
+		       false,
+		       "************************************************");
+    }
+
+    return (mMpClassifier.mAnnoteMountPoints.size()!=0)? true : false;
+}
+
+
 FGFSInfoAnswer
 AsyncGlobalFileStatus::isFullyDistributed() const
 {

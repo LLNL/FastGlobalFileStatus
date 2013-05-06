@@ -53,6 +53,13 @@ namespace FastGlobalFileStatus {
          */
         static bool initialize(CommLayer::CommFabric *c);
 
+	/**
+         *   printMpClassifier
+         *
+         *   @return a bool value
+         */
+        static bool printMpClassifier();
+
         /**
          *   Is the path served in the fully distributed fashion?
          *   The path is served through node local storage. Yes implies
