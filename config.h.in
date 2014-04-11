@@ -131,6 +131,12 @@
 /* MRNet 3.X */
 #undef MRNET3
 
+/* MRNet 3.1 */
+#undef MRNET31
+
+/* MRNet 4.0 */
+#undef MRNET40
+
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
 

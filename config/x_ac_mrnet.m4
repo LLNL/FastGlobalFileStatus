@@ -12,6 +12,11 @@ AC_DEFUN([X_AC_MRNET], [
        MRNETPREFIX=""
     ]
   )
+  mrn_incs=`ls -d $MRNETPREFIX/lib/*/include` 
+  for mrn_inc in $mrn_incs
+  do
+    MRNET_CXXFLAGS="-I$mrn_inc $MRNET_CXXFLAGS"
+  done
 
   TMP_CXXFLAGS=$CXXFLAGS
   CXXFLAGS="$MRNET_CXXFLAGS $CXXFLAGS"
@@ -27,17 +32,52 @@ AC_DEFUN([X_AC_MRNET], [
   mrnet_vers=-1
   AC_COMPILE_IFELSE([#include "mrnet/MRNet.h"
     using namespace MRN;
+    using namespace std;
     int main()
     {
-      Network *net;
-      net->register_EventCallback(Event::TOPOLOGY_EVENT, TopologyEvent::TOPOL_ADD_BE, NULL, NULL);
+      uint64_t bufLength;
+      DataType type;
+      DataElement pkt;
+      pkt.get_array(&type, &bufLength);
     }],
-    [AC_DEFINE([MRNET3], [], [MRNet 3.X])
-      AC_DEFINE([MRNET22], [], [MRNet 2.2]) 
-      AC_DEFINE([MRNET2], [], [MRNet 2.X])
-      mrnet_vers=3.X
+    [AC_DEFINE([MRNET40], [], [MRNet 4.0])
+      AC_DEFINE([MRNET31], [], [MRNet 3.1])
+      AC_DEFINE([MRNET3], [], [MRNet 3.X]) 
+      mrnet_vers=4.0
     ]
   )
+  if test $mrnet_vers = -1; then
+    AC_COMPILE_IFELSE([#include "mrnet/MRNet.h"
+      using namespace MRN;
+      using namespace std;
+      int main()
+      {
+        Network *net;
+        vector<const char *> f;
+        vector<int> fid;
+        net->load_FilterFuncs(NULL, f, fid);
+      }],
+      [AC_DEFINE([MRNET31], [], [MRNet 3.1])
+        AC_DEFINE([MRNET3], [], [MRNet 3.X]) 
+        mrnet_vers=3.1
+      ]
+    )
+  fi
+  if test $mrnet_vers = -1; then
+    AC_COMPILE_IFELSE([#include "mrnet/MRNet.h"
+      using namespace MRN;
+      int main()
+      {
+        Network *net;
+        net->register_EventCallback(Event::TOPOLOGY_EVENT, TopologyEvent::TOPOL_ADD_BE, NULL, NULL);
+      }],
+      [AC_DEFINE([MRNET3], [], [MRNet 3.X])
+       AC_DEFINE([MRNET22], [], [MRNet 2.2]) 
+        AC_DEFINE([MRNET2], [], [MRNet 2.X])
+        mrnet_vers=3.X
+      ]
+    )
+  fi
   if test $mrnet_vers = -1; then
     AC_COMPILE_IFELSE([#include "mrnet/MRNet.h"
       using namespace MRN;
