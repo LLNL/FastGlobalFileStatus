@@ -51,7 +51,7 @@ EXTRA_DIST                     = mrnet_topo_gen.sh.in \
 sync_stat_dso_mpi_SOURCES      = sync_stat_dso_mpi.C \
                                  FgfsTestGetDsoList.C
 sync_stat_dso_mpi_CXXFLAGS     = $(AM_CXXFLAGS) $(MPI_CFLAGS)
-sync_stat_dso_mpi_LDFLAGS      = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+sync_stat_dso_mpi_LDFLAGS      = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 sync_stat_dso_mpi_LDADD        = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 
@@ -61,7 +61,7 @@ sync_stat_dso_mpi_LDADD        = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 async_stat_dso_mpi_SOURCES     = async_stat_dso_mpi.C \
                                  FgfsTestGetDsoList.C
 async_stat_dso_mpi_CXXFLAGS    = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-async_stat_dso_mpi_LDFLAGS     = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+async_stat_dso_mpi_LDFLAGS     = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 async_stat_dso_mpi_LDADD       = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 
@@ -71,7 +71,7 @@ async_stat_dso_mpi_LDADD       = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 sync_stat_apath_mpi_SOURCES      = sync_stat_apath_mpi.C \
                                    FgfsTestGetDsoList.C
 sync_stat_apath_mpi_CXXFLAGS     = $(AM_CXXFLAGS) $(MPI_CFLAGS)
-sync_stat_apath_mpi_LDFLAGS      = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+sync_stat_apath_mpi_LDFLAGS      = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 sync_stat_apath_mpi_LDADD        = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 
@@ -80,7 +80,7 @@ sync_stat_apath_mpi_LDADD        = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 #
 st_classifier_constmem_per_proc_SOURCES     = st_classifier_constmem_per_proc.C
 st_classifier_constmem_per_proc_CXXFLAGS    = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-st_classifier_constmem_per_proc_LDFLAGS     = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+st_classifier_constmem_per_proc_LDFLAGS     = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 st_classifier_constmem_per_proc_LDADD       = @LIBMPA@ -lfgfs_mpi
 
 
@@ -90,7 +90,7 @@ st_classifier_constmem_per_proc_LDADD       = @LIBMPA@ -lfgfs_mpi
 st_classifier_c_lang_SOURCES   = st_classifier_c_lang.C \
                                  g_fs_stat_c_wrap.C
 st_classifier_c_lang_CXXFLAGS  = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-st_classifier_c_lang_LDFLAGS   = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+st_classifier_c_lang_LDFLAGS   = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 st_classifier_c_lang_LDADD     = @LIBMPA@ -lfgfs_mpi
 
 
@@ -99,7 +99,7 @@ st_classifier_c_lang_LDADD     = @LIBMPA@ -lfgfs_mpi
 #
 st_classifier_big_on_oneproc_SOURCES  = st_classifier_big_on_oneproc.C
 st_classifier_big_on_oneproc_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-st_classifier_big_on_oneproc_LDFLAGS  = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+st_classifier_big_on_oneproc_LDFLAGS  = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 st_classifier_big_on_oneproc_LDADD    = @LIBMPA@ -lfgfs_mpi
 
 
@@ -108,7 +108,7 @@ st_classifier_big_on_oneproc_LDADD    = @LIBMPA@ -lfgfs_mpi
 #
 st_mountpoint_classifier_SOURCES  = st_mountpoint_classifier.C
 st_mountpoint_classifier_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-st_mountpoint_classifier_LDFLAGS  = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+st_mountpoint_classifier_LDFLAGS  = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 st_mountpoint_classifier_LDADD    = @LIBMPA@ -lfgfs_mpi
 
 
@@ -117,7 +117,7 @@ st_mountpoint_classifier_LDADD    = @LIBMPA@ -lfgfs_mpi
 #
 gen_hostlist_SOURCES           = gen_hostlist.C
 gen_hostlist_CXXFLAGS          = $(MPI_CFLAGS) $(AM_CXXFLAGS) 
-gen_hostlist_LDFLAGS           = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+gen_hostlist_LDFLAGS           = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 
 
 #
