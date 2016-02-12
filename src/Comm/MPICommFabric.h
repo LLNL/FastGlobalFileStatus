@@ -160,7 +160,7 @@ namespace FastGlobalFileStatus {
 
         MPI_Datatype getMPIDataType(ReduceDataType t) const;
 
-        MPI_Datatype getMPIOp(ReduceOperator op) const;
+        MPI_Op getMPIOp(ReduceOperator op) const;
 
         MPICommFabric(const CommFabric &c);
 
