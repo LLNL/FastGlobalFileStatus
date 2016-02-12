@@ -52,7 +52,7 @@ sync_stat_dso_mpi_SOURCES      = sync_stat_dso_mpi.C \
                                  FgfsTestGetDsoList.C
 sync_stat_dso_mpi_CXXFLAGS     = $(AM_CXXFLAGS) $(MPI_CFLAGS)
 sync_stat_dso_mpi_LDFLAGS      = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
-sync_stat_dso_mpi_LDADD        = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+sync_stat_dso_mpi_LDADD        = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 
 #
@@ -62,7 +62,7 @@ async_stat_dso_mpi_SOURCES     = async_stat_dso_mpi.C \
                                  FgfsTestGetDsoList.C
 async_stat_dso_mpi_CXXFLAGS    = $(MPI_CFLAGS) $(AM_CXXFLAGS)
 async_stat_dso_mpi_LDFLAGS     = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
-async_stat_dso_mpi_LDADD       = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+async_stat_dso_mpi_LDADD       = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 
 #
@@ -72,7 +72,7 @@ sync_stat_apath_mpi_SOURCES      = sync_stat_apath_mpi.C \
                                    FgfsTestGetDsoList.C
 sync_stat_apath_mpi_CXXFLAGS     = $(AM_CXXFLAGS) $(MPI_CFLAGS)
 sync_stat_apath_mpi_LDFLAGS      = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
-sync_stat_apath_mpi_LDADD        = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+sync_stat_apath_mpi_LDADD        = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 
 #
@@ -144,7 +144,7 @@ async_stat_dso_mrnet_SOURCES   = async_stat_dso_mrnet.C \
 				 FgfsMRNetWrapper.C
 async_stat_dso_mrnet_CXXFLAGS  = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) 
 async_stat_dso_mrnet_LDFLAGS   = -Wl,-E -L@MPALOC@/lib -L../../src $(MRNET_LDFLAGS) 
-async_stat_dso_mrnet_LDADD     = -lelf -lssl @LIBMPA@ -lfgfs_mrnet 
+async_stat_dso_mrnet_LDADD     = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mrnet 
 
 
 do_subst = sed -e 's,@MRNETTOPGEN@,@MRNETTOPGENBIN@,g'
