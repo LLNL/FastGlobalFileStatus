@@ -39,7 +39,12 @@ subdir = src
 DIST_COMMON = $(include_HEADERS) $(nobase_include_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_enable_debug.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
+	$(top_srcdir)/config/ltoptions.m4 \
+	$(top_srcdir)/config/ltsugar.m4 \
+	$(top_srcdir)/config/ltversion.m4 \
+	$(top_srcdir)/config/lt~obsolete.m4 \
+	$(top_srcdir)/config/x_ac_enable_debug.m4 \
 	$(top_srcdir)/config/x_ac_max_dist_degree.m4 \
 	$(top_srcdir)/config/x_ac_mpa.m4 \
 	$(top_srcdir)/config/x_ac_mrnet.m4 \
@@ -190,9 +195,9 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 MPALOC = @MPALOC@
-MPICC = @MPICC@
-MPI_CFLAGS = @MPI_CFLAGS@
-MPI_CLDFLAGS = @MPI_CLDFLAGS@
+MPICXX = @MPICXX@
+MPI_CXXFLAGS = @MPI_CXXFLAGS@
+MPI_CXXLDFLAGS = @MPI_CXXLDFLAGS@
 MRNETCOMMNODEBIN = @MRNETCOMMNODEBIN@
 MRNETTOPGENBIN = @MRNETTOPGENBIN@
 MRNET_CXXFLAGS = @MRNET_CXXFLAGS@
@@ -294,7 +299,7 @@ libfgfs_mpi_la_SOURCES = bloom.c \
 
 libfgfs_mpi_la_CFLAGS = $(AM_CFLAGS)
 libfgfs_mpi_la_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-libfgfs_mpi_la_LDFLAGS = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) $(MPI_CLDFLAGS) \
+libfgfs_mpi_la_LDFLAGS = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) $(MPI_CXXLDFLAGS) \
                             -version-info @FGFS_CURRENT@:@FGFS_REVISION@:@FGFS_AGE@
 
 
