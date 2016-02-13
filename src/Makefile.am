@@ -43,7 +43,7 @@ libfgfs_mpi_la_SOURCES    = bloom.c \
 
 libfgfs_mpi_la_CFLAGS     = $(AM_CFLAGS)
 libfgfs_mpi_la_CXXFLAGS   = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-libfgfs_mpi_la_LDFLAGS    = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) $(MPI_CLDFLAGS) \
+libfgfs_mpi_la_LDFLAGS    = $(AM_LDFLAGS) -L@MPALOC@/lib $(LIBMPA) $(MPI_CXXLDFLAGS) \
                             -version-info @FGFS_CURRENT@:@FGFS_REVISION@:@FGFS_AGE@
 
 #

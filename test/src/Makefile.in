@@ -46,7 +46,12 @@ test_PROGRAMS = sync_stat_dso_mpi$(EXEEXT) async_stat_dso_mpi$(EXEEXT) \
 subdir = test/src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_enable_debug.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
+	$(top_srcdir)/config/ltoptions.m4 \
+	$(top_srcdir)/config/ltsugar.m4 \
+	$(top_srcdir)/config/ltversion.m4 \
+	$(top_srcdir)/config/lt~obsolete.m4 \
+	$(top_srcdir)/config/x_ac_enable_debug.m4 \
 	$(top_srcdir)/config/x_ac_max_dist_degree.m4 \
 	$(top_srcdir)/config/x_ac_mpa.m4 \
 	$(top_srcdir)/config/x_ac_mrnet.m4 \
@@ -253,9 +258,9 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 MPALOC = @MPALOC@
-MPICC = @MPICC@
-MPI_CFLAGS = @MPI_CFLAGS@
-MPI_CLDFLAGS = @MPI_CLDFLAGS@
+MPICXX = @MPICXX@
+MPI_CXXFLAGS = @MPI_CXXFLAGS@
+MPI_CXXLDFLAGS = @MPI_CXXLDFLAGS@
 MRNETCOMMNODEBIN = @MRNETCOMMNODEBIN@
 MRNETTOPGENBIN = @MRNETTOPGENBIN@
 MRNET_CXXFLAGS = @MRNET_CXXFLAGS@
@@ -358,8 +363,8 @@ sync_stat_dso_mpi_SOURCES = sync_stat_dso_mpi.C \
                                  FgfsTestGetDsoList.C
 
 sync_stat_dso_mpi_CXXFLAGS = $(AM_CXXFLAGS) $(MPI_CFLAGS)
-sync_stat_dso_mpi_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
-sync_stat_dso_mpi_LDADD = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+sync_stat_dso_mpi_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
+sync_stat_dso_mpi_LDADD = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 #
 #  ASYNC_STAT_DSO_MPI rules
@@ -368,8 +373,8 @@ async_stat_dso_mpi_SOURCES = async_stat_dso_mpi.C \
                                  FgfsTestGetDsoList.C
 
 async_stat_dso_mpi_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-async_stat_dso_mpi_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
-async_stat_dso_mpi_LDADD = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+async_stat_dso_mpi_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
+async_stat_dso_mpi_LDADD = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 #
 #  SYNC_STAT_APATH_MPI rules
@@ -378,15 +383,15 @@ sync_stat_apath_mpi_SOURCES = sync_stat_apath_mpi.C \
                                    FgfsTestGetDsoList.C
 
 sync_stat_apath_mpi_CXXFLAGS = $(AM_CXXFLAGS) $(MPI_CFLAGS)
-sync_stat_apath_mpi_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
-sync_stat_apath_mpi_LDADD = -lelf -lssl @LIBMPA@ -lfgfs_mpi
+sync_stat_apath_mpi_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
+sync_stat_apath_mpi_LDADD = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mpi
 
 #
 #  ST_CLASSIFIER_CONSTMEM_PER_PROC  rules
 #
 st_classifier_constmem_per_proc_SOURCES = st_classifier_constmem_per_proc.C
 st_classifier_constmem_per_proc_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-st_classifier_constmem_per_proc_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+st_classifier_constmem_per_proc_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 st_classifier_constmem_per_proc_LDADD = @LIBMPA@ -lfgfs_mpi
 
 #
@@ -396,7 +401,7 @@ st_classifier_c_lang_SOURCES = st_classifier_c_lang.C \
                                  g_fs_stat_c_wrap.C
 
 st_classifier_c_lang_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-st_classifier_c_lang_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+st_classifier_c_lang_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 st_classifier_c_lang_LDADD = @LIBMPA@ -lfgfs_mpi
 
 #
@@ -404,7 +409,7 @@ st_classifier_c_lang_LDADD = @LIBMPA@ -lfgfs_mpi
 #
 st_classifier_big_on_oneproc_SOURCES = st_classifier_big_on_oneproc.C
 st_classifier_big_on_oneproc_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-st_classifier_big_on_oneproc_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+st_classifier_big_on_oneproc_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 st_classifier_big_on_oneproc_LDADD = @LIBMPA@ -lfgfs_mpi
 
 #
@@ -412,7 +417,7 @@ st_classifier_big_on_oneproc_LDADD = @LIBMPA@ -lfgfs_mpi
 #
 st_mountpoint_classifier_SOURCES = st_mountpoint_classifier.C
 st_mountpoint_classifier_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS)
-st_mountpoint_classifier_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+st_mountpoint_classifier_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 st_mountpoint_classifier_LDADD = @LIBMPA@ -lfgfs_mpi
 
 #
@@ -420,7 +425,7 @@ st_mountpoint_classifier_LDADD = @LIBMPA@ -lfgfs_mpi
 #
 gen_hostlist_SOURCES = gen_hostlist.C
 gen_hostlist_CXXFLAGS = $(MPI_CFLAGS) $(AM_CXXFLAGS) 
-gen_hostlist_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CLDFLAGS)
+gen_hostlist_LDFLAGS = -L@MPALOC@/lib -L../../src $(MPI_CXXLDFLAGS)
 
 #
 #  mrnet_node_req rules
@@ -445,7 +450,7 @@ async_stat_dso_mrnet_SOURCES = async_stat_dso_mrnet.C \
 
 async_stat_dso_mrnet_CXXFLAGS = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) 
 async_stat_dso_mrnet_LDFLAGS = -Wl,-E -L@MPALOC@/lib -L../../src $(MRNET_LDFLAGS) 
-async_stat_dso_mrnet_LDADD = -lelf -lssl @LIBMPA@ -lfgfs_mrnet 
+async_stat_dso_mrnet_LDADD = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mrnet 
 do_subst = sed -e 's,@MRNETTOPGEN@,@MRNETTOPGENBIN@,g'
 all: all-am
 

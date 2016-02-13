@@ -791,9 +791,9 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 LIBELF
-MPI_CLDFLAGS
-MPI_CFLAGS
-MPICC
+MPI_CXXLDFLAGS
+MPI_CXXFLAGS
+MPICXX
 CXXCPP
 CPP
 OTOOL64
@@ -8931,6 +8931,10 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
+## CAVEAT EMPTOR:
+## There is no encapsulation within the following macros, do not change
+## the running order or otherwise move them around unless you know exactly
+## what you are doing...
 if test -n "$compiler"; then
 
 lt_prog_compiler_no_builtin_flag=
@@ -8956,11 +8960,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8959: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8963: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8963: \$? = $ac_status" >&5
+   echo "$as_me:8967: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9295,11 +9299,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9298: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9302: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9302: \$? = $ac_status" >&5
+   echo "$as_me:9306: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9400,11 +9404,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9403: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9407: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9407: \$? = $ac_status" >&5
+   echo "$as_me:9411: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9455,11 +9459,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9458: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9462: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9462: \$? = $ac_status" >&5
+   echo "$as_me:9466: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12258,7 +12262,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12261 "configure"
+#line 12265 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12354,7 +12358,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12357 "configure"
+#line 12361 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14374,11 +14378,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14377: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14381: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14381: \$? = $ac_status" >&5
+   echo "$as_me:14385: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14473,11 +14477,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14476: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14480: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14480: \$? = $ac_status" >&5
+   echo "$as_me:14484: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14525,11 +14529,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14528: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14532: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14532: \$? = $ac_status" >&5
+   echo "$as_me:14536: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16441,24 +16445,30 @@ fi
 
 
 
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-         if [ ! -z "$MPICC" ]; then
+
+         if [ ! -z "$MPICXX" ]; then
 
      # Try to find a working MPI compiler from the supplied names
-     for ac_prog in $MPICC
+     for ac_prog in $MPICXX
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 { $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_path_MPICC+set}" = set; then
+if test "${ac_cv_path_MPICXX+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
-  case $MPICC in
+  case $MPICXX in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_MPICC="$MPICC" # Let the user override the test with a path.
+  ac_cv_path_MPICXX="$MPICXX" # Let the user override the test with a path.
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
@@ -16468,7 +16478,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_MPICC="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_path_MPICXX="$as_dir/$ac_word$ac_exec_ext"
     $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -16479,44 +16489,44 @@ IFS=$as_save_IFS
   ;;
 esac
 fi
-MPICC=$ac_cv_path_MPICC
-if test -n "$MPICC"; then
-  { $as_echo "$as_me:$LINENO: result: $MPICC" >&5
-$as_echo "$MPICC" >&6; }
+MPICXX=$ac_cv_path_MPICXX
+if test -n "$MPICXX"; then
+  { $as_echo "$as_me:$LINENO: result: $MPICXX" >&5
+$as_echo "$MPICXX" >&6; }
 else
   { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
 
-  test -n "$MPICC" && break
+  test -n "$MPICXX" && break
 done
-test -n "$MPICC" || MPICC="not-found"
+test -n "$MPICXX" || MPICXX="not-found"
 
 
      # Figure out what the compiler responds to to get it to show us the compile
      # and link lines. After this part of the macro, we'll have a valid
      # lx_mpi_command_line
-     echo -n "Checking whether $MPICC responds to '-showme:compile'... "
-     lx_mpi_compile_line=`$MPICC -showme:compile 2>/dev/null`
+     echo -n "Checking whether $MPICXX responds to '-showme:compile'... "
+     lx_mpi_compile_line=`$MPICXX -showme:compile 2>/dev/null`
      if [ "$?" -eq 0 ]; then
          echo yes
-         lx_mpi_link_line=`$MPICC -showme:link 2>/dev/null`
+         lx_mpi_link_line=`$MPICXX -showme:link 2>/dev/null`
      else
          echo no
-         echo -n "Checking whether $MPICC responds to '-showme'... "
-         lx_mpi_command_line=`$MPICC -showme 2>/dev/null`
+         echo -n "Checking whether $MPICXX responds to '-showme'... "
+         lx_mpi_command_line=`$MPICXX -showme 2>/dev/null`
          if [ "$?" -ne 0 ]; then
              echo no
-             echo -n "Checking whether $MPICC responds to '-compile-info'... "
-             lx_mpi_compile_line=`$MPICC -compile-info 2>/dev/null`
+             echo -n "Checking whether $MPICXX responds to '-compile-info'... "
+             lx_mpi_compile_line=`$MPICXX -compile-info 2>/dev/null`
              if [ "$?" -eq 0 ]; then
                  echo yes
-                 lx_mpi_link_line=`$MPICC -link-info 2>/dev/null`
+                 lx_mpi_link_line=`$MPICXX -link-info 2>/dev/null`
              else
                  echo no
-                 echo -n "Checking whether $MPICC responds to '-show'... "
-                 lx_mpi_command_line=`$MPICC -show 2>/dev/null`
+                 echo -n "Checking whether $MPICXX responds to '-show'... "
+                 lx_mpi_command_line=`$MPICXX -show 2>/dev/null`
                  if [ "$?" -eq 0 ]; then
                      echo yes
                  else
@@ -16542,15 +16552,15 @@ test -n "$MPICC" || MPICC="not-found"
          lx_mpi_link_args=` echo "$lx_mpi_command_line" | grep -o -- '\(^\| \)-Wl,\([^\"[:space:]]\+\|\"[^\"[:space:]]\+\"\)'`
 
          # Create variables and clean up newlines and multiple spaces
-         MPI_CFLAGS="$lx_mpi_defines $lx_mpi_includes"
-         MPI_CLDFLAGS="$lx_mpi_link_paths $lx_mpi_libs $lx_mpi_link_args"
-         MPI_CFLAGS=` echo "$MPI_CFLAGS" | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ +/ /g'`
-         MPI_CLDFLAGS=`echo "$MPI_CLDFLAGS" | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ +/ /g'`
+         MPI_CXXFLAGS="$lx_mpi_defines $lx_mpi_includes"
+         MPI_CXXLDFLAGS="$lx_mpi_link_paths $lx_mpi_libs $lx_mpi_link_args"
+         MPI_CXXFLAGS=` echo "$MPI_CXXFLAGS" | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ +/ /g'`
+         MPI_CXXLDFLAGS=`echo "$MPI_CXXLDFLAGS" | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ +/ /g'`
 
          OLD_CPPFLAGS=$CPPFLAGS
          OLD_LIBS=$LIBS
-         CPPFLAGS=$MPI_CFLAGS
-         LIBS=$MPI_CLDFLAGS
+         CPPFLAGS=$MPI_CXXFLAGS
+         LIBS=$MPI_CXXLDFLAGS
 
          cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -16584,7 +16594,7 @@ $as_echo "$ac_try_echo") >&5
   cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
+	 test -z "$ac_cxx_werror_flag" ||
 	 test ! -s conftest.err
        } && test -s conftest$ac_exeext && {
 	 test "$cross_compiling" = yes ||
@@ -16596,15 +16606,15 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_MPI 1
 _ACEOF
 
-                      have_C_mpi='yes'
+                      have_CXX_mpi='yes'
 else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 	# zero out mpi flags so we don't link against the faulty library.
-                      MPI_CFLAGS=""
-                      MPI_CLDFLAGS=""
-                      have_C_mpi='no'
+                      MPI_CXXFLAGS=""
+                      MPI_CXXLDFLAGS=""
+                      have_CXX_mpi='no'
 fi
 
 rm -rf conftest.dSYM
@@ -16619,25 +16629,25 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
          LIBS=$OLD_LIBS
          CPPFLAGS=$OLD_CPPFLAGS
      else
-         Echo Unable to find suitable MPI Compiler. Try setting MPICC.
-         have_C_mpi='no'
+         Echo Unable to find suitable MPI Compiler. Try setting MPICXX.
+         have_CXX_mpi='no'
      fi
 
          else
 
      # Try to find a working MPI compiler from the supplied names
-     for ac_prog in mpicc mpiicc mpixlc mpipgcc
+     for ac_prog in mpicxx mpiCC mpic++ mpig++ mpiicpc mpipgCC mpixlC
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 { $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_path_MPICC+set}" = set; then
+if test "${ac_cv_path_MPICXX+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
-  case $MPICC in
+  case $MPICXX in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_MPICC="$MPICC" # Let the user override the test with a path.
+  ac_cv_path_MPICXX="$MPICXX" # Let the user override the test with a path.
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
@@ -16647,7 +16657,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_MPICC="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_path_MPICXX="$as_dir/$ac_word$ac_exec_ext"
     $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -16658,44 +16668,44 @@ IFS=$as_save_IFS
   ;;
 esac
 fi
-MPICC=$ac_cv_path_MPICC
-if test -n "$MPICC"; then
-  { $as_echo "$as_me:$LINENO: result: $MPICC" >&5
-$as_echo "$MPICC" >&6; }
+MPICXX=$ac_cv_path_MPICXX
+if test -n "$MPICXX"; then
+  { $as_echo "$as_me:$LINENO: result: $MPICXX" >&5
+$as_echo "$MPICXX" >&6; }
 else
   { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
 
-  test -n "$MPICC" && break
+  test -n "$MPICXX" && break
 done
-test -n "$MPICC" || MPICC="not-found"
+test -n "$MPICXX" || MPICXX="not-found"
 
 
      # Figure out what the compiler responds to to get it to show us the compile
      # and link lines. After this part of the macro, we'll have a valid
      # lx_mpi_command_line
-     echo -n "Checking whether $MPICC responds to '-showme:compile'... "
-     lx_mpi_compile_line=`$MPICC -showme:compile 2>/dev/null`
+     echo -n "Checking whether $MPICXX responds to '-showme:compile'... "
+     lx_mpi_compile_line=`$MPICXX -showme:compile 2>/dev/null`
      if [ "$?" -eq 0 ]; then
          echo yes
-         lx_mpi_link_line=`$MPICC -showme:link 2>/dev/null`
+         lx_mpi_link_line=`$MPICXX -showme:link 2>/dev/null`
      else
          echo no
-         echo -n "Checking whether $MPICC responds to '-showme'... "
-         lx_mpi_command_line=`$MPICC -showme 2>/dev/null`
+         echo -n "Checking whether $MPICXX responds to '-showme'... "
+         lx_mpi_command_line=`$MPICXX -showme 2>/dev/null`
          if [ "$?" -ne 0 ]; then
              echo no
-             echo -n "Checking whether $MPICC responds to '-compile-info'... "
-             lx_mpi_compile_line=`$MPICC -compile-info 2>/dev/null`
+             echo -n "Checking whether $MPICXX responds to '-compile-info'... "
+             lx_mpi_compile_line=`$MPICXX -compile-info 2>/dev/null`
              if [ "$?" -eq 0 ]; then
                  echo yes
-                 lx_mpi_link_line=`$MPICC -link-info 2>/dev/null`
+                 lx_mpi_link_line=`$MPICXX -link-info 2>/dev/null`
              else
                  echo no
-                 echo -n "Checking whether $MPICC responds to '-show'... "
-                 lx_mpi_command_line=`$MPICC -show 2>/dev/null`
+                 echo -n "Checking whether $MPICXX responds to '-show'... "
+                 lx_mpi_command_line=`$MPICXX -show 2>/dev/null`
                  if [ "$?" -eq 0 ]; then
                      echo yes
                  else
@@ -16721,15 +16731,15 @@ test -n "$MPICC" || MPICC="not-found"
          lx_mpi_link_args=` echo "$lx_mpi_command_line" | grep -o -- '\(^\| \)-Wl,\([^\"[:space:]]\+\|\"[^\"[:space:]]\+\"\)'`
 
          # Create variables and clean up newlines and multiple spaces
-         MPI_CFLAGS="$lx_mpi_defines $lx_mpi_includes"
-         MPI_CLDFLAGS="$lx_mpi_link_paths $lx_mpi_libs $lx_mpi_link_args"
-         MPI_CFLAGS=` echo "$MPI_CFLAGS" | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ +/ /g'`
-         MPI_CLDFLAGS=`echo "$MPI_CLDFLAGS" | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ +/ /g'`
+         MPI_CXXFLAGS="$lx_mpi_defines $lx_mpi_includes"
+         MPI_CXXLDFLAGS="$lx_mpi_link_paths $lx_mpi_libs $lx_mpi_link_args"
+         MPI_CXXFLAGS=` echo "$MPI_CXXFLAGS" | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ +/ /g'`
+         MPI_CXXLDFLAGS=`echo "$MPI_CXXLDFLAGS" | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ +/ /g'`
 
          OLD_CPPFLAGS=$CPPFLAGS
          OLD_LIBS=$LIBS
-         CPPFLAGS=$MPI_CFLAGS
-         LIBS=$MPI_CLDFLAGS
+         CPPFLAGS=$MPI_CXXFLAGS
+         LIBS=$MPI_CXXLDFLAGS
 
          cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -16763,7 +16773,7 @@ $as_echo "$ac_try_echo") >&5
   cat conftest.err >&5
   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
+	 test -z "$ac_cxx_werror_flag" ||
 	 test ! -s conftest.err
        } && test -s conftest$ac_exeext && {
 	 test "$cross_compiling" = yes ||
@@ -16775,15 +16785,15 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_MPI 1
 _ACEOF
 
-                      have_C_mpi='yes'
+                      have_CXX_mpi='yes'
 else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 	# zero out mpi flags so we don't link against the faulty library.
-                      MPI_CFLAGS=""
-                      MPI_CLDFLAGS=""
-                      have_C_mpi='no'
+                      MPI_CXXFLAGS=""
+                      MPI_CXXLDFLAGS=""
+                      have_CXX_mpi='no'
 fi
 
 rm -rf conftest.dSYM
@@ -16798,12 +16808,18 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
          LIBS=$OLD_LIBS
          CPPFLAGS=$OLD_CPPFLAGS
      else
-         Echo Unable to find suitable MPI Compiler. Try setting MPICC.
-         have_C_mpi='no'
+         Echo Unable to find suitable MPI Compiler. Try setting MPICXX.
+         have_CXX_mpi='no'
      fi
 
          fi
 
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 

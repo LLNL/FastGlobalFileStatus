@@ -405,7 +405,7 @@ MPICommFabric::getMPIDataType(ReduceDataType t) const
 }
 
 
-MPI_Datatype
+MPI_Op
 MPICommFabric::getMPIOp(ReduceOperator op) const
 {
     // MPI_MAXLOC is the error op in this function
