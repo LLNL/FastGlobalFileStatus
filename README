@@ -101,6 +101,10 @@
      * Please follow README of MountPointAttributes (MPA) to configure, 
        build and install this dependent module.
 
+     * If building from the GIT repository, first run:
+
+       % bootstrap
+
      * Assuming MPA has been installed in <your_install_path> and also MPI
        is available through normal installations, the following command 
        should configure this package for both MPI and MRNet:
