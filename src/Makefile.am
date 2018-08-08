@@ -18,7 +18,7 @@
 
 lib_LTLIBRARIES           = libfgfs_mpi.la libfgfs_mrnet.la libfgfs_filter.la
 
-INCLUDES                  = -I$(top_srcdir) -I@MPALOC@/include
+AM_CPPFLAGS               = -I$(top_srcdir) -I@MPALOC@/include
 
 nobase_include_HEADERS    = Comm/DistDesc.h \
                             Comm/CommFabric.h \

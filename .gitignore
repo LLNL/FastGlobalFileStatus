@@ -1,9 +1,42 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html><head>
-<title>302 Found</title>
-</head><body>
-<h1>Found</h1>
-<p>The document has moved <a href="https://adept.llnl.gov/documentation/.gitignore">here</a>.</p>
-<hr>
-<address>Apache/2.2.3 (Red Hat) Server at adept.llnl.gov Port 80</address>
-</body></html>
+Makefile.in
+autom4te.cache/
+config.h.in
+config.h.in~
+config/libtool.m4
+config/ltoptions.m4
+config/ltsugar.m4
+config/ltversion.m4
+config/lt~obsolete.m4
+configure
+src/Makefile.in
+test/Makefile.in
+test/src/Makefile.in
+Makefile
+config.h
+config.log
+config.status
+libtool
+src/.deps/
+src/.libs/
+src/Makefile
+src/*.la
+src/*.lo
+src/*.o
+stamp-h1
+test/Makefile
+test/src/.deps/
+test/src/Makefile
+test/src/async_stat_dso_mpi
+test/src/*.o
+test/src/async_stat_dso_mrnet
+test/src/gen_hostlist
+test/src/mrnet_node_req
+test/src/mrnet_topo_gen.sh
+test/src/my_topo_gen
+test/src/st_classifier_big_on_oneproc
+test/src/st_classifier_c_lang
+test/src/st_classifier_constmem_per_proc
+test/src/st_mountpoint_classifier
+test/src/sync_stat_apath_mpi
+test/src/sync_stat_dso_mpi
+
