@@ -18,6 +18,10 @@ AM_CPPFLAGS                    = -I$(top_srcdir) \
                                  -I$(top_srcdir)/src \
                                  -I@MPALOC@/include
 
+nobase_include_HEADERS         = FgfsTestGetDsoList.h \
+                                 g_fs_stat_c_wrap.h \
+                                 FgfsMRNetWrapper.h
+
 testdir                        = ${pkgdatadir}/tests
 test_PROGRAMS                  = sync_stat_dso_mpi \
                                  async_stat_dso_mpi \
@@ -141,7 +145,7 @@ my_topo_gen_LDFLAGS            = -L../../src
 #
 async_stat_dso_mrnet_SOURCES   = async_stat_dso_mrnet.C \
                                  FgfsTestGetDsoList.C \
-				 FgfsMRNetWrapper.C
+                                 FgfsMRNetWrapper.C
 async_stat_dso_mrnet_CXXFLAGS  = $(MRNET_CXXFLAGS) $(AM_CXXFLAGS) 
 async_stat_dso_mrnet_LDFLAGS   = -Wl,-E -L@MPALOC@/lib -L../../src $(MRNET_LDFLAGS) 
 async_stat_dso_mrnet_LDADD     = -lelf -lssl -lcrypto @LIBMPA@ -lfgfs_mrnet 
