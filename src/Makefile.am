@@ -23,7 +23,10 @@ AM_CPPFLAGS               = -I$(top_srcdir) -I@MPALOC@/include
 nobase_include_HEADERS    = Comm/DistDesc.h \
                             Comm/CommFabric.h \
                             Comm/MPICommFabric.h \
-                            Comm/MRNetCommFabric.h
+                            Comm/MPIReduction.h \
+                            Comm/MRNetCommFabric.h \
+                            bloom.h \
+                            OpenSSLFileSigGen.h
 
 include_HEADERS           = FastGlobalFileStat.h \
                             SyncFastGlobalFileStat.h \
