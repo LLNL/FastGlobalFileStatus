@@ -155,6 +155,7 @@ FgfsParDesc::operator=(const FgfsParDesc &rhs)
 
     mUriString = rhs.mUriString;
     groupingMap = rhs.groupingMap;
+    return *this;
 }
 
 
