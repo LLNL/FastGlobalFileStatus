@@ -80,6 +80,7 @@ bool
 AsyncGlobalFileStatus::initialize(CommLayer::CommFabric *c)
 {
     mMpClassifier.runClassification(c);
+    return true;
 }
 
 
