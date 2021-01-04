@@ -126,6 +126,7 @@ bool
 GlobalFileStatusAPI::setNodeLocal(bool b)
 {
     mNodeLocal = b;
+    return true;
 }
 
 
