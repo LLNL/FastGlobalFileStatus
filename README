@@ -58,8 +58,8 @@
 
 3. Compatibility
 
-     Fast Global File Status v1.1
-       - MountPointAttributes (v1.1)
+     Fast Global File Status v1.1.1
+       - MountPointAttributes (v1.1.1)
        - MRNet (v3.1.0, v4.0.0 w/ performance patch, v5.x)
        - OpenSSL (v1.0.0)
 
