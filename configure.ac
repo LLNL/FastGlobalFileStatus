@@ -12,7 +12,7 @@ dnl         June 29 2011 DHA: File created.
 dnl                          
 
 AC_PREREQ(2.59)
-AC_INIT(FastGlobalFileStatus, 1.1, ahn1@llnl.gov)
+AC_INIT(FastGlobalFileStatus, 1.1.1, ahn1@llnl.gov)
 dnl Version numbers, remember to change them just *before* a release. 
 dnl (Interfaces removed: CURRENT++, AGE=0, REVISION=0)
 dnl (Interfaces added: CURRENT++, AGE++, REVISION=0)
